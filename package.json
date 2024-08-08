@@ -18,19 +18,14 @@
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
-<<<<<<< HEAD
     "react-hook-form": "^7.52.2",
     "zod": "^3.23.8"
-=======
-    "react-hook-form": "^7.52.2"
->>>>>>> 4a82472550b9b654443311ddbdfac35ef1c898e8
   },
   "devDependencies": {
     "drizzle-kit": "^0.23.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "drizzle-kit": "^0.23.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
