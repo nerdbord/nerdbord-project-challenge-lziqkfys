@@ -10,22 +10,22 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.43",
-    "@hookform/resolvers": "^3.9.0",
-    "ai": "^3.3.3",
-    "zod": "^3.23.8",
     "@clerk/nextjs": "^5.2.14",
+    "@hookform/resolvers": "^3.9.0",
     "@neondatabase/serverless": "^0.9.4",
-    "drizzle-orm": "^0.32.2",
+    "ai": "^3.3.3",
+    "drizzle-orm": "^0.33.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
-    "drizzle-kit": "^0.23.2"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "drizzle-kit": "^0.23.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "postcss": "^8",
