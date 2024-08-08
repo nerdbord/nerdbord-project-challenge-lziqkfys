@@ -1,12 +1,13 @@
 import { useForm } from "react-hook-form";
-import { FormSchema } from "../types/types";
+import { FormSchema, FormType } from "../types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 interface DynamicFormProps {
-  schema: FormData;
+  formData: FormType
 }
 
-const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
+const DynamicForm: React.FC<DynamicFormProps> = ({ formData }) => {
   const {
     register,
     handleSubmit,
@@ -21,7 +22,7 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ schema }) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {schema.elements.map((element) => (
+      {formData.elements.map((element) => (
         <div key={element.name} className="flex flex-col">
           <label className="font-medium text-gray-700">{element.label}</label>
           {element.type === "select" && element.options ? (
