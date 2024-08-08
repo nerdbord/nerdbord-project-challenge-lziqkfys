@@ -1,6 +1,6 @@
 'use server'
 import { generateObject } from "ai";
-import { openaiClient } from "./openai";
+import { openaiClient } from "./openAI";
 import { FormSchema, FormType } from "../types/types";
 
 export default async function generateForm(prompt: string) {
