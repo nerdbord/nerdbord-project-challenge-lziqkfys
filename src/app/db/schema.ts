@@ -12,6 +12,7 @@ import {
   boolean,
   jsonb,
   timestamp,
+  uuid
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -28,7 +29,7 @@ export const users = pgTable("users", {
 // Formularz będzie przechowywany jako JSON w polu formData.
 export const forms = pgTable("forms", {
   id: serial("id").primaryKey(),
-  formId: text("form_id").unique().notNull(), // Unique form identifier, used in URLs
+  formId: uuid("form_id").defaultRandom().notNull().unique(), // Unique form identifier of type UUID, used in URLs
   userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
   formData: jsonb("form_data").notNull(), // JSON representing the form schema
   webhookUrl: text("webhook_url"),
@@ -48,7 +49,7 @@ export const formsRelations = relations(forms, ({ one }) => ({
 
 export const submissions = pgTable("submissions", {
   id: serial("id").primaryKey(),
-  formId: text("form_id").references(() => forms.formId, {
+  formId: uuid("form_id").references(() => forms.formId, {
     onDelete: "cascade",
   }),
   submissionData: jsonb("submission_data").notNull(), // JSON representing the submitted data
