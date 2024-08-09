@@ -15,7 +15,6 @@ export default async function generateForm(prompt: string): Promise<FormType> {
         // content: "Fill out the data for a form, based on the user's message.",
         content: "i would like to collect data from guests for my upcoming birthday party"
       },
-
       {
         role: "user",
         content: prompt,

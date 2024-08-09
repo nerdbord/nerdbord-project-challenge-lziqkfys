@@ -1,22 +1,42 @@
 import { db } from "../db";
 import { forms } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { FormType } from "../types/types";
+import DynamicForm from "../generator/DynamicForm";
 
-const FormIdPage = async ({ params }: { params: { formId: string } }) => {
-  const formId = params.formId;
-  console.log("formId: ", formId)
 
-  if (!formId) {
+interface FormIdPageProps {
+  formId: string;
+  params: {
+    formId: string;
+  };
+}
+
+export async function getFormDataById(formId: string): Promise<FormType | null> {
+  const form = await db
+  .select({
+    formData: forms.formData
+  })
+  .from(forms)
+  .where(eq(forms.formId, formId))
+  .limit(1);
+
+return form.length > 0 ? form[0].formData as FormType : null;
+}
+
+const FormIdPage = async ({ params }: { params: FormIdPageProps }) => {
+  const formData = await getFormDataById(params.formId);
+
+  if (!formData) {
     return <div>Form not found</div>;
   }
 
-  const form = await db.query.forms.findFirst({
-    where: eq(forms.id, parseInt(formId)),
-  });
-
-  if(!form){
-    return <div>Form not found</div>
-  }
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <h1>Form ID: {params.formId}</h1>
+      <DynamicForm formData={formData} />
+    </div>
+  );
 };
 
 export default FormIdPage;

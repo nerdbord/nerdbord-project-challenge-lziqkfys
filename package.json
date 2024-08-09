@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:studio": "drizzle-kit studio",
+    "db:generate": "drizzle-kit generate --dialect=postgresql --schema=src/app/db/schema.ts --out=./drizzle",
+    "db:migrate": "tsx ./src/app/db/migrate.ts",
+    "db:push": "drizzle-kit push --config=drizzle.config.ts",
+    "db:seed": "tsx ./src/app/db/seed.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.43",
@@ -22,14 +27,17 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.23.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.23.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
+    "pg": "^8.12.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.7.1",
     "typescript": "^5"
   }
 }
