@@ -1,30 +1,38 @@
 import { useForm } from "react-hook-form";
-import { FormSchema, FormType } from "../types/types";
+import { FormType, generateSchema } from "../types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 
 interface DynamicFormProps {
-  formData: FormType
+  formData: FormType;
 }
 
 const DynamicForm: React.FC<DynamicFormProps> = ({ formData }) => {
+  const formSchema = generateSchema(formData);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(formSchema),
   });
 
   const onSubmit = (data: any) => {
     console.log("Form Data:", data);
   };
 
+  const handleEdit = () => {
+    
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {formData.elements.map((element) => (
         <div key={element.name} className="flex flex-col">
-          <label className="font-medium text-gray-700">{element.label}</label>
+          <div className="flex flex-row justify-between">
+            <label className="font-medium text-gray-700">{element.label}</label>{" "}
+            <button type="button" onClick={handleEdit}>edit</button>
+          </div>
           {element.type === "select" && element.options ? (
             <select
               {...register(element.name, { required: element.required })}
@@ -40,7 +48,10 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ formData }) => {
             <input
               type={element.type}
               placeholder={element.placeholder}
-              {...register(element.name, { required: element.required })}
+              {...register(element.name, {
+                required: element.required,
+                valueAsNumber: element.type === "number" ? true : false,
+              })}
               className="mt-1 p-2 border rounded-md"
             />
           )}

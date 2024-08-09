@@ -5,19 +5,17 @@ export const FormSchema = z.object({
     z.object({
       name: z.string(),
       label: z.string(),
-      placeholder: z.string(),
+      placeholder: z.string().optional(),
       required: z.boolean(),
       type: z.union([
         z.literal("checkbox"),
         z.literal("color"),
         z.literal("date"),
         z.literal("email"),
-        z.literal("file"),
         z.literal("password"),
         z.literal("date"),
         z.literal("number"),
         z.literal("password"),
-        z.literal("radio"),
         z.literal("range"),
         z.literal("text"),
         z.literal("time"),
@@ -34,3 +32,41 @@ export const FormSchema = z.object({
 });
 
 export type FormType = z.infer<typeof FormSchema>;
+
+export const generateSchema = (formData: FormType) => {
+  const schemaShape: Record<string, z.ZodTypeAny> = {};
+
+  formData.elements.forEach((element) => {
+    let fieldSchema: z.ZodTypeAny;
+
+    switch (element.type) {
+      case "text":
+      case "email":
+      case "select":
+        fieldSchema = z.string();
+        if (element.required) {
+          fieldSchema = z.string().min(1);
+        }
+        break;
+      case "number":
+        fieldSchema = z.number();
+        if (element.required) {
+          fieldSchema = z.number().min(1);
+        }
+        break;
+      case "checkbox":
+        fieldSchema = z.boolean();
+        break;
+      default:
+        fieldSchema = z.string();
+        if (element.required) {
+          fieldSchema = z.string().min(1);
+        }
+        break;
+    }
+
+    schemaShape[element.name] = fieldSchema;
+  });
+
+  return z.object(schemaShape);
+};
