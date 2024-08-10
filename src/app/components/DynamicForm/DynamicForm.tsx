@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { FormType, generateSchema } from "../types/types";
+import { FormType, generateSchema } from "../../types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 interface DynamicFormProps {
@@ -17,21 +17,42 @@ const DynamicForm: React.FC<DynamicFormProps> = ({ formData }) => {
     resolver: zodResolver(formSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Form Data:", data);
+  const onSubmit = async (data: any) => {
+    try {
+      const response = await fetch("https://submit-form.com/YKEFWFXpa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        //mode: "no-cors"
+      });
+
+      if (response.ok) {
+        alert("Form submitted successfully!");
+      } else {
+        alert("Failed to submit the form.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while submitting the form.");
+    }
   };
 
-  const handleEdit = () => {
-    
-  };
+  const handleEdit = () => {};
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {formData.elements.map((element) => (
         <div key={element.name} className="flex flex-col">
           <div className="flex flex-row justify-between">
-            <label className="font-medium text-gray-700">{element.label}</label>{" "}
-            <button type="button" onClick={handleEdit}>edit</button>
+            <label className="font-medium text-gray-700">
+              {element.label}{" "}
+              {element.required && <span className="text-red-500">*</span>}
+            </label>
+            <button type="button" onClick={handleEdit}>
+              edit
+            </button>
           </div>
           {element.type === "select" && element.options ? (
             <select

@@ -40,14 +40,6 @@ export const generateSchema = (formData: FormType) => {
     let fieldSchema: z.ZodTypeAny;
 
     switch (element.type) {
-      case "text":
-      case "email":
-      case "select":
-        fieldSchema = z.string();
-        if (element.required) {
-          fieldSchema = z.string().min(1);
-        }
-        break;
       case "number":
         fieldSchema = z.number();
         if (element.required) {
