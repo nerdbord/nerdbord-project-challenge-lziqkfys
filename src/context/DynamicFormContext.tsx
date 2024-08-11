@@ -1,29 +1,30 @@
 'use client'
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
-import { FormType } from "../types/types";
+// DynamicFormContext.tsx
+import React, { createContext, useContext, useState } from "react";
+import { FormType } from "@/types/types";
 
-interface DynamicFormContextType {
-  dynamicForm: FormType | null;
-  setDynamicForm: React.Dispatch<React.SetStateAction<FormType | null>>;
-}
+const DynamicFormContext = createContext<{
+  dynamicForm: FormType;
+  setDynamicForm: React.Dispatch<React.SetStateAction<FormType>>;
+} | undefined>(undefined);
 
-const DynamicFormContext = createContext<DynamicFormContextType | undefined>(undefined);
-
-export const DynamicFormProvider = ({ children }: { children: ReactNode }) => {
-  const [dynamicForm, setDynamicForm] = useState<FormType | null>(null);
+export const DynamicFormProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [dynamicForm, setDynamicForm] = useState<FormType>({
+    elements: [],
+  });
 
   return (
-    <DynamicFormContext.Provider value={{ dynamicForm: dynamicForm, setDynamicForm }}>
+    <DynamicFormContext.Provider value={{ dynamicForm, setDynamicForm }}>
       {children}
     </DynamicFormContext.Provider>
   );
 };
 
-export const useDynamicFormContext = (): DynamicFormContextType => {
+export const useDynamicFormContext = () => {
   const context = useContext(DynamicFormContext);
   if (context === undefined) {
-    throw new Error("useFormContext must be used within a FormProvider");
+    throw new Error("useDynamicFormContext must be used within a DynamicFormProvider");
   }
   return context;
 };

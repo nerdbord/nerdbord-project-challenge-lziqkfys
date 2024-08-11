@@ -1,7 +1,8 @@
 "use server";
 import { generateObject } from "ai";
 import { openaiClient } from "./openAI";
-import { FormSchema, FormType } from "../types/types";
+import { FormSchema, FormType } from "@/types/types";
+
 
 export default async function generateForm(
   prompt: string
@@ -14,20 +15,18 @@ export default async function generateForm(
       messages: [
         {
           role: "system",
-          content:
-            "Fill out the data for a form, based on the user's message. The field 'name' must be unique for each object in the array.",
+          content: "Create an object containing data for a webform, based on user's prompt.",
         },
         {
           role: "user",
           content: prompt,
         },
       ],
-    });
-
+    });    
     return result.object as FormType;
   } catch (error) {
     console.error("Error generating form:", error);
-    
+
     return null;
   }
 }

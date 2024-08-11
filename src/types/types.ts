@@ -1,37 +1,36 @@
 import { z } from "zod";
 
+export const FormElementSchema = z.object({
+  name: z.string(),
+  label: z.string(),
+  placeholder: z.string().optional(),
+  required: z.boolean(),
+  type: z.union([
+    z.literal("checkbox"),
+    z.literal("color"),
+    z.literal("email"),
+    z.literal("password"),
+    z.literal("date"),
+    z.literal("number"),
+    z.literal("range"),
+    z.literal("text"),
+    z.literal("time"),
+    z.literal("url"),
+    z.literal("week"),
+    z.literal("month"),
+    z.literal("tel"),
+    z.literal("date"),
+    z.literal("select"),
+  ]),
+  options: z.array(z.string()).optional(),
+});
+
 export const FormSchema = z.object({
-  elements: z.array(
-    z.object({
-      name: z.string(),
-      label: z.string(),
-      placeholder: z.string().optional(),
-      required: z.boolean(),
-      type: z.union([
-        z.literal("checkbox"),
-        z.literal("color"),
-        z.literal("date"),
-        z.literal("email"),
-        z.literal("password"),
-        z.literal("date"),
-        z.literal("number"),
-        z.literal("password"),
-        z.literal("range"),
-        z.literal("text"),
-        z.literal("time"),
-        z.literal("url"),
-        z.literal("week"),
-        z.literal("month"),
-        z.literal("tel"),
-        z.literal("date"),
-        z.literal("select"),
-      ]),
-      options: z.array(z.string()).optional(),
-    })
-  ),
+  elements: z.array(FormElementSchema),
 });
 
 export type FormType = z.infer<typeof FormSchema>;
+export type FormElementType = z.infer<typeof FormElementSchema>;
 
 export const generateSchema = (formData: FormType) => {
   const schemaShape: Record<string, z.ZodTypeAny> = {};
@@ -48,6 +47,9 @@ export const generateSchema = (formData: FormType) => {
         break;
       case "checkbox":
         fieldSchema = z.boolean();
+        if (!element.required) {
+          fieldSchema = z.boolean().optional();
+        }
         break;
       default:
         fieldSchema = z.string();
