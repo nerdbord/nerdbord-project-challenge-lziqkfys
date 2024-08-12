@@ -131,9 +131,9 @@ const EditModal: React.FC<EditModalProps> = ({
                   add
                 </button>
               </div>
-              {fields.map((option, index) => {
+              {fields.map((option: { option: string }, index) => {
                 return (
-                  <div className="flex flex-row">
+                  <div className="flex flex-row" key={index}>
                     <input
                       className="mt-1 p-2 border rounded-md w-full"
                       {...register(`options.${index}.option`)}
