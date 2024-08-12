@@ -51,7 +51,7 @@ const DynamicForm: React.FC = () => {
 
   const handleSave = (updatedElement: FormType["elements"][number]) => {
     const updatedElements = dynamicForm.elements.map((el) =>
-      el.name === selectedElement?.name ? updatedElement : el
+      el.fieldName === selectedElement?.fieldName ? updatedElement : el
     );
     setDynamicForm({ ...dynamicForm, elements: updatedElements });
   };
@@ -72,12 +72,12 @@ const DynamicForm: React.FC = () => {
             </div>
             {element.type === "select" && element.options ? (
               <select
-                {...register(element.name, { required: element.required })}
+                {...register(element.fieldName, { required: element.required })}
                 className="mt-1 p-2 border rounded-md"
               >
                 {element.options.map((option, idx) => (
-                  <option key={idx} value={option}>
-                    {option}
+                  <option key={idx} value={option.option}>
+                    {option.option}
                   </option>
                 ))}
               </select>
@@ -85,14 +85,14 @@ const DynamicForm: React.FC = () => {
               <input
                 type={element.type}
                 placeholder={element.placeholder}
-                {...register(element.name, {
+                {...register(element.fieldName, {
                   required: element.required,
                   valueAsNumber: element.type === "number" ? true : false,
                 })}
                 className="mt-1 p-2 border rounded-md"
               />
             )}
-            {errors[element.name] && (
+            {errors[element.fieldName] && (
               <span className="text-red-500 text-sm">
                 This field is required
               </span>

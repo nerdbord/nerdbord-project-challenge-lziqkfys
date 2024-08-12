@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FormElementSchema, FormElementType, FormType } from "@/types/types";
-import { useDynamicFormContext } from "@/context/DynamicFormContext";
+import { FormElementSchema, FormElementType } from "@/types/types";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -18,19 +16,21 @@ const EditModal: React.FC<EditModalProps> = ({
   onSave,
   initialData,
 }) => {
-  console.log("INITIALDATA: ", initialData);
-
-  const [isSelect, setIsSelect] = useState(initialData.type === "select");
-  const { dynamicForm, setDynamicForm } = useDynamicFormContext();
-
   const {
     register,
     handleSubmit,
     reset,
+    watch,
+    control,
     formState: { errors },
   } = useForm<FormElementType>({
     resolver: zodResolver(FormElementSchema),
     defaultValues: initialData,
+  });
+
+  const { fields, remove, insert } = useFieldArray<FormElementType>({
+    control,
+    name: "options",
   });
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const EditModal: React.FC<EditModalProps> = ({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-md shadow-md">
         <h2 className="text-xl font-semibold mb-4">
-          Edit Element "${initialData.name}"
+          Edit Element "${watch("fieldName")}"
         </h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
@@ -56,10 +56,10 @@ const EditModal: React.FC<EditModalProps> = ({
               Name
             </label>
             <input
-              {...register("name")}
+              {...register("fieldName")}
               className="mt-1 p-2 border rounded-md w-full"
             />
-            {errors.name && (
+            {errors.fieldName && (
               <span className="text-red-500 text-sm">
                 This field is required
               </span>
@@ -101,21 +101,54 @@ const EditModal: React.FC<EditModalProps> = ({
             >
               <option value="text">Text</option>
               <option value="number">Number</option>
-              <option value="checkbox">Checkbox</option>
               <option value="select">Select</option>
-              {/* Add other types as necessary */}
+              <option value="checkbox">Checkbox</option>
+              <option value="range">Range</option>
+              <option value="color">Color</option>
+              <option value="email">Email</option>
+              <option value="password">Password</option>
+              <option value="date">Date</option>
+              <option value="time">Time</option>
+              <option value="url">Url</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+              <option value="tel">Telephone</option>
             </select>
           </div>
 
-          {initialData.type === "select" && (
+          {watch("type") === "select" && (
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Options (comma separated)
-              </label>
-              <input
-                {...register("options")}
-                className="mt-1 p-2 border rounded-md w-full"
-              />
+              <div className="flex flex-row justify-between">
+                <label className="block text-sm font-medium text-gray-700">
+                  Options
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    insert(0, { option: "" });
+                  }}
+                >
+                  add
+                </button>
+              </div>
+              {fields.map((option, index) => {
+                return (
+                  <div className="flex flex-row">
+                    <input
+                      className="mt-1 p-2 border rounded-md w-full"
+                      {...register(`options.${index}.option`)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        remove(index);
+                      }}
+                    >
+                      del
+                    </button>
+                  </div>
+                );
+              })}
               {errors.options && (
                 <span className="text-red-500 text-sm">
                   At least one option is required

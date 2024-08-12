@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const FormElementSchema = z.object({
-  name: z.string(),
+  fieldName: z.string(),
   label: z.string(),
   placeholder: z.string().optional(),
   required: z.boolean(),
@@ -22,7 +22,7 @@ export const FormElementSchema = z.object({
     z.literal("date"),
     z.literal("select"),
   ]),
-  options: z.array(z.string()).optional(),
+  options: z.array(z.object({ option: z.string() })).optional(),
 });
 
 export const FormSchema = z.object({
@@ -59,7 +59,7 @@ export const generateSchema = (formData: FormType) => {
         break;
     }
 
-    schemaShape[element.name] = fieldSchema;
+    schemaShape[element.fieldName] = fieldSchema;
   });
 
   return z.object(schemaShape);
