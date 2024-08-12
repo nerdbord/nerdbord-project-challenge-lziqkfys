@@ -22,6 +22,7 @@ const EditModal: React.FC<EditModalProps> = ({
     reset,
     watch,
     control,
+    setError,
     formState: { errors },
   } = useForm<FormElementType>({
     resolver: zodResolver(FormElementSchema),
@@ -31,6 +32,7 @@ const EditModal: React.FC<EditModalProps> = ({
   const { fields, remove, insert } = useFieldArray<FormElementType>({
     control,
     name: "options",
+    rules: { minLength: 1 },
   });
 
   useEffect(() => {
@@ -40,6 +42,14 @@ const EditModal: React.FC<EditModalProps> = ({
   const onSubmit = (data: FormElementType) => {
     onSave(data);
     onClose();
+  };
+
+  const handleRemove = (index: number) => {
+    if (fields.length == 1) {
+      setError("options", { message: "At least one option required!" });
+    } else {
+      remove(index);
+    }
   };
 
   if (!isOpen) return null;
@@ -141,7 +151,7 @@ const EditModal: React.FC<EditModalProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        remove(index);
+                        handleRemove(index);
                       }}
                     >
                       del
