@@ -14,13 +14,9 @@ const DynamicForm: React.FC = () => {
   >(null);
   const formSchema = generateSchema(dynamicForm);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<FormType>({
+  const { handleSubmit } = useForm<FormType>({
     resolver: zodResolver(formSchema),
-    defaultValues: dynamicForm,
+    defaultValues: dynamicForm as FormType,
   });
 
   const onSubmit = async (data: any) => {
@@ -91,7 +87,7 @@ const DynamicForm: React.FC = () => {
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {dynamicForm.elements.map((element, i) => (
+        {dynamicForm.elements.map((element: FormElementType, i) => (
           <div key={i} className="flex flex-col">
             <div className="flex flex-row justify-between">
               <label className="font-medium text-gray-700">
@@ -108,10 +104,7 @@ const DynamicForm: React.FC = () => {
               </button>
             </div>
             {element.type === "select" && element.options ? (
-              <select
-                {...register(element.fieldName, { required: element.required })}
-                className="mt-1 p-2 border rounded-md"
-              >
+              <select className="mt-1 p-2 border rounded-md">
                 {element.options.map((option, idx) => (
                   <option key={idx} value={option.option}>
                     {option.option}
@@ -122,17 +115,8 @@ const DynamicForm: React.FC = () => {
               <input
                 type={element.type}
                 placeholder={element.placeholder}
-                {...register(element.fieldName, {
-                  required: element.required,
-                  valueAsNumber: element.type === "number" ? true : false,
-                })}
                 className="mt-1 p-2 border rounded-md"
               />
-            )}
-            {errors[element.fieldName] && (
-              <span className="text-red-500 text-sm">
-                This field is required
-              </span>
             )}
           </div>
         ))}
