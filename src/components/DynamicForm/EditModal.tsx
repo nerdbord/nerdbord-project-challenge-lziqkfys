@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormElementSchema, FormElementType } from "@/types/types";
+import { useDynamicFormContext } from "@/context/DynamicFormContext";
 
 interface EditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onRemove: () => void;
   onSave: (element: FormElementType) => void;
   initialData: FormElementType;
 }
@@ -13,9 +15,12 @@ interface EditModalProps {
 const EditModal: React.FC<EditModalProps> = ({
   isOpen,
   onClose,
+  onRemove,
   onSave,
   initialData,
 }) => {
+  const { dynamicForm, setDynamicForm } = useDynamicFormContext();
+
   const {
     register,
     handleSubmit,
@@ -40,6 +45,21 @@ const EditModal: React.FC<EditModalProps> = ({
   }, [initialData, reset]);
 
   const onSubmit = (data: FormElementType) => {
+    const exisingFieldNames = dynamicForm.elements.map(
+      (element) => element.fieldName
+    );
+
+    const isDuplicate =
+      exisingFieldNames.includes(data.fieldName) &&
+      data.fieldName !== initialData.fieldName;
+
+    if (isDuplicate) {
+      setError("fieldName", {
+        message: "fieldName cannot be the same as another element.",
+      });
+      return;
+    }
+
     onSave(data);
     onClose();
   };
@@ -58,12 +78,12 @@ const EditModal: React.FC<EditModalProps> = ({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-md shadow-md">
         <h2 className="text-xl font-semibold mb-4">
-          Edit Element "${watch("fieldName")}"
+          Edit Element "{initialData.fieldName}"
         </h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
-              Name
+              Field Name
             </label>
             <input
               {...register("fieldName")}
@@ -71,7 +91,7 @@ const EditModal: React.FC<EditModalProps> = ({
             />
             {errors.fieldName && (
               <span className="text-red-500 text-sm">
-                This field is required
+                {errors.fieldName.message}
               </span>
             )}
           </div>
@@ -86,7 +106,7 @@ const EditModal: React.FC<EditModalProps> = ({
             />
             {errors.label && (
               <span className="text-red-500 text-sm">
-                This field is required
+                {errors.label.message}
               </span>
             )}
           </div>
@@ -99,6 +119,11 @@ const EditModal: React.FC<EditModalProps> = ({
               {...register("placeholder")}
               className="mt-1 p-2 border rounded-md w-full"
             />
+            {errors.placeholder && (
+              <span className="text-red-500 text-sm">
+                {errors.placeholder.message}
+              </span>
+            )}
           </div>
 
           <div className="mb-4">
@@ -179,6 +204,13 @@ const EditModal: React.FC<EditModalProps> = ({
           </div>
 
           <div className="flex justify-end space-x-2">
+            <button
+              type="button"
+              onClick={onRemove}
+              className="px-4 py-2 bg-red-500 text-white rounded-md"
+            >
+              Remove
+            </button>
             <button
               type="button"
               onClick={onClose}

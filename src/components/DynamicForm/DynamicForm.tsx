@@ -1,9 +1,10 @@
-import { useForm } from "react-hook-form";
-import { FormType, generateSchema } from "@/types/types";
+import { useFieldArray, useForm } from "react-hook-form";
+import { FormElementType, FormType, generateSchema } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { useState } from "react";
 import EditModal from "./EditModal";
+import generateUniqueId from "generate-unique-id";
 
 const DynamicForm: React.FC = () => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
@@ -11,15 +12,15 @@ const DynamicForm: React.FC = () => {
   const [selectedElement, setSelectedElement] = useState<
     FormType["elements"][number] | null
   >(null);
-
   const formSchema = generateSchema(dynamicForm);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormType>({
     resolver: zodResolver(formSchema),
+    defaultValues: dynamicForm,
   });
 
   const onSubmit = async (data: any) => {
@@ -45,14 +46,45 @@ const DynamicForm: React.FC = () => {
   };
 
   const handleEdit = (element: FormType["elements"][number]) => {
-    setIsModalOpen(true);
     setSelectedElement(element);
+    setIsModalOpen(true);
   };
 
-  const handleSave = (updatedElement: FormType["elements"][number]) => {
+  const handleSaveForm = () => {};
+
+  const handleSaveElement = (updatedElement: FormType["elements"][number]) => {
     const updatedElements = dynamicForm.elements.map((el) =>
       el.fieldName === selectedElement?.fieldName ? updatedElement : el
     );
+    setDynamicForm({ ...dynamicForm, elements: updatedElements });
+  };
+
+  const handleRemoveElement = () => {
+    if (!selectedElement) return;
+
+    const updatedElements = dynamicForm.elements.filter((el) => {
+      return el.fieldName !== selectedElement.fieldName;
+    });
+    setDynamicForm({ ...dynamicForm, elements: updatedElements });
+    setIsModalOpen(false);
+  };
+
+  const handleAddElement = () => {
+    const newElementName = generateUniqueId({
+      length: 10,
+      includeSymbols: ["@", "#"],
+    });
+    const newElement: FormElementType = {
+      fieldName: newElementName,
+      type: "text",
+      label: "Element label",
+      placeholder: "Element placeholder",
+      required: false,
+      options: [{ option: "" }],
+    };
+
+    const updatedElements = [...dynamicForm.elements, newElement];
+
     setDynamicForm({ ...dynamicForm, elements: updatedElements });
   };
 
@@ -66,7 +98,12 @@ const DynamicForm: React.FC = () => {
                 {element.label}{" "}
                 {element.required && <span className="text-red-500">*</span>}
               </label>
-              <button type="button" onClick={() => {handleEdit(element)}}>
+              <button
+                type="button"
+                onClick={() => {
+                  handleEdit(element);
+                }}
+              >
                 edit
               </button>
             </div>
@@ -101,11 +138,32 @@ const DynamicForm: React.FC = () => {
         ))}
       </form>
 
+      {
+        <button
+          type="button"
+          className="px-5 py-2.5 rounded-full text-white text-sm tracking-wider font-medium border border-current outline-none bg-green-700 hover:bg-green-800 active:bg-green-700"
+          onClick={handleAddElement}
+        >
+          Add element
+        </button>
+      }
+
+      {dynamicForm.elements.length > 0 && (
+        <button
+          type="button"
+          onClick={handleSaveForm}
+          className="px-5 py-2.5 rounded-full text-white text-sm tracking-wider font-medium border border-current outline-none bg-green-700 hover:bg-green-800 active:bg-green-700"
+        >
+          Save form
+        </button>
+      )}
+
       {selectedElement && (
         <EditModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          onSave={handleSave}
+          onSave={handleSaveElement}
+          onRemove={handleRemoveElement}
           initialData={selectedElement}
         />
       )}
