@@ -8,6 +8,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import { DynamicFormProvider } from "@/context/DynamicFormContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,20 +23,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body className={inter.className}>
-          <header>
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
-          <main>{children}</main>
-        </body>
-      </html>
-    </ClerkProvider>
+    <DynamicFormProvider>
+      <ClerkProvider>
+        <html lang="en">
+          <body className={inter.className}>
+            <header>
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </header>
+            <main>{children}</main>
+          </body>
+        </html>
+      </ClerkProvider>
+    </DynamicFormProvider>
   );
 }
