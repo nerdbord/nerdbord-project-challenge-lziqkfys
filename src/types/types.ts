@@ -40,6 +40,7 @@ export const generateSchema = (formData: FormType) => {
 
     switch (element.type) {
       case "number":
+      case "tel":
         fieldSchema = z.number();
         if (element.required) {
           fieldSchema = z.number().min(1);

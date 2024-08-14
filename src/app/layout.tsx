@@ -23,10 +23,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <DynamicFormProvider>
-      <ClerkProvider>
-        <html lang="en">
-          <body className={inter.className}>
+    <ClerkProvider>
+      <html lang="en">
+        <body className={inter.className}>
+          <DynamicFormProvider>
             <header>
               <SignedOut>
                 <SignInButton />
@@ -36,9 +36,9 @@ export default function RootLayout({
               </SignedIn>
             </header>
             <main>{children}</main>
-          </body>
-        </html>
-      </ClerkProvider>
-    </DynamicFormProvider>
+          </DynamicFormProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
