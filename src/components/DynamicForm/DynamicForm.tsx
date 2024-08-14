@@ -5,14 +5,21 @@ import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { useEffect, useState } from "react";
 import EditModal from "./EditModal";
 import generateUniqueId from "generate-unique-id";
+import { auth, clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { redirect } from "next/dist/server/api-utils";
 
 const DynamicForm: React.FC = () => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
+  const [endpointURL, setEndpointURL] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<
     FormType["elements"][number] | null
   >(null);
   const formSchema = generateSchema(dynamicForm);
+
+  const { isLoaded, userId, sessionId, isSignedIn } = useAuth();
+  const { openSignIn } = useClerk();
 
   const { handleSubmit } = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -20,25 +27,24 @@ const DynamicForm: React.FC = () => {
   });
 
   const onSubmit = async (data: any) => {
-    try {
-      const response = await fetch("https://submit-form.com/YKEFWFXpa", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-        //mode: "no-cors"
-      });
-
-      if (response.ok) {
-        alert("Form submitted successfully!");
-      } else {
-        alert("Failed to submit the form.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while submitting the form.");
-    }
+    // try {
+    //   const response = await fetch("https://submit-form.com/YKEFWFXpa", {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(data),
+    //     //mode: "no-cors"
+    //   });
+    //   if (response.ok) {
+    //     alert("Form submitted successfully!");
+    //   } else {
+    //     alert("Failed to submit the form.");
+    //   }
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   alert("An error occurred while submitting the form.");
+    // }
   };
 
   const handleEdit = (element: FormType["elements"][number]) => {
@@ -47,7 +53,13 @@ const DynamicForm: React.FC = () => {
   };
 
   const handleSaveForm = () => {
-    setDynamicForm({elements: []})
+    console.log("HERE!!!!!", isSignedIn);
+
+    
+
+    if (!isSignedIn) {
+      openSignIn();
+    }
   };
 
   const handleSaveElement = (updatedElement: FormType["elements"][number]) => {
