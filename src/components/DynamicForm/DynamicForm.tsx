@@ -2,7 +2,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormElementType, FormType, generateSchema } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditModal from "./EditModal";
 import generateUniqueId from "generate-unique-id";
 
@@ -46,7 +46,9 @@ const DynamicForm: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveForm = () => {};
+  const handleSaveForm = () => {
+    setDynamicForm({elements: []})
+  };
 
   const handleSaveElement = (updatedElement: FormType["elements"][number]) => {
     const updatedElements = dynamicForm.elements.map((el) =>

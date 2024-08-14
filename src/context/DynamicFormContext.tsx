@@ -15,20 +15,32 @@ const DynamicFormContext = createContext<
 export const DynamicFormProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [dynamicForm, setDynamicForm] = useState<FormType>(() => {
-    if (typeof window !== "undefined") {
-      const savedData = window.localStorage.getItem("dynamicFormState");
-      return savedData ? JSON.parse(savedData) : { elements: [] };
-    }
-    return { elements: [] };
-  });
+  const [dynamicForm, setDynamicForm] = useState<FormType>({elements: []});
+  const [isHydrated, setIsHydrated] = useState(false);
+
 
   useEffect(() => {
-    window.localStorage.setItem(
-      "dynamicFormState",
-      JSON.stringify(dynamicForm)
-    );
-  }, [dynamicForm]);
+    if (typeof window !== "undefined") {
+      const savedData = window.localStorage.getItem("dynamicFormState");
+      if (savedData) {
+        setDynamicForm(JSON.parse(savedData));
+      }
+    }
+    setIsHydrated(true)
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated) {
+      window.localStorage.setItem(
+        "dynamicFormState",
+        JSON.stringify(dynamicForm)
+      );
+    }
+  }, [dynamicForm, isHydrated]);
+
+  if (!isHydrated) {
+    return null;    
+  }
 
   return (
     <DynamicFormContext.Provider value={{ dynamicForm, setDynamicForm }}>
