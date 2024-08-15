@@ -25,11 +25,23 @@ export const FormElementSchema = z.object({
   options: z.array(z.object({ option: z.string() })).optional(),
 });
 
+
 export const FormSchema = z.object({
   elements: z.array(FormElementSchema),
 });
 
+export const ExtendedFormSchema = z.object({
+  formID: z.string(),
+  formName: z.string(),
+  elements: z.array(FormElementSchema),
+  userID: z.string().optional(),
+  webhookUrl: z.string().optional(),
+  createdAt: z.string()
+})
+
+
 export type FormType = z.infer<typeof FormSchema>;
+export type ExtendedFormType = z.infer<typeof ExtendedFormSchema>;
 export type FormElementType = z.infer<typeof FormElementSchema>;
 
 export const generateSchema = (formData: FormType) => {

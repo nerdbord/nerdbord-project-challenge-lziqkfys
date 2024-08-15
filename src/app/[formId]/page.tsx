@@ -1,36 +1,16 @@
-import { db } from "../db";
+import { dataBase } from "../db";
 import { forms } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { FormType } from "@/types/types";
 
 
 interface FormIdPageProps {
-  formId: string;
   params: {
     formId: string;
   };
 }
 
-export async function getFormDataById(formId: string): Promise<any> {
-  const form = await db
-    .select({
-      id: forms.id,
-      formId: forms.formId,
-      userId: forms.userId,
-      formData: forms.formData,
-      webhookUrl: forms.webhookUrl,
-      createdAt: forms.createdAt,
-      published: forms.published,
-    })
-    .from(forms)
-    .where(eq(forms.formId, formId))
-    .limit(1);
-
-  return form.length > 0 ? form[0].formData : null;
-}
-
 const FormIdPage = async ({ params }: { params: FormIdPageProps }) => {
-  const form = await getFormDataById(params.formId);
 
   if (!form) {
     return <div>Form not found</div>;

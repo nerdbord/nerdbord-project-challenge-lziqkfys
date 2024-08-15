@@ -2,17 +2,34 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormElementType, FormType, generateSchema } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import EditModal from "./EditModal";
 import generateUniqueId from "generate-unique-id";
+import { auth, clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { redirect } from "next/dist/server/api-utils";
+import { table } from "console";
+import { forms } from "@/app/db/schema";
+import { updateFormDataWithNewUserID } from "@/app/db";
 
-const DynamicForm: React.FC = () => {
+interface DynamicFormProps {
+  formId: string;
+}
+
+const DynamicForm = (props: DynamicFormProps) => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
+  const [endpointURL, setEndpointURL] = useState<string>();
+  const [formName, setFormName] = useState<string>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<
     FormType["elements"][number] | null
   >(null);
   const formSchema = generateSchema(dynamicForm);
+
+  const { isLoaded, userId, sessionId, isSignedIn } = useAuth();
+  const { openSignIn } = useClerk();
+
+  // const data = await db.select().from(forms);
 
   const { handleSubmit } = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -29,7 +46,6 @@ const DynamicForm: React.FC = () => {
         body: JSON.stringify(data),
         //mode: "no-cors"
       });
-
       if (response.ok) {
         alert("Form submitted successfully!");
       } else {
@@ -46,8 +62,23 @@ const DynamicForm: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveForm = () => {
-    setDynamicForm({elements: []})
+  const handleSaveForm = async () => {
+    if (!isSignedIn) {
+      openSignIn();
+    }
+    if (userId && endpointURL && formName) {
+      try {
+        await updateFormDataWithNewUserID(
+          dynamicForm,
+          userId,
+          props.formId,
+          endpointURL,
+          formName
+        );
+      } catch (error) {
+        console.error("Failed to update form data:", error);
+      }
+    }
   };
 
   const handleSaveElement = (updatedElement: FormType["elements"][number]) => {
@@ -86,8 +117,32 @@ const DynamicForm: React.FC = () => {
     setDynamicForm({ ...dynamicForm, elements: updatedElements });
   };
 
+  const handleFormName = (event: ChangeEvent<HTMLInputElement>) => {
+    setFormName(event.target.value);
+  };
+
+  const handleEndpointUrl = (event: ChangeEvent<HTMLInputElement>) => {
+    setEndpointURL(event.target.value);
+  };
+
   return (
     <div>
+      <div className="flex flex-row">
+        <input
+          type="text"
+          placeholder="Please enter form name."
+          className="mt-1 p-2 border rounded-md"
+          value={formName}
+          onChange={handleFormName}
+        />
+        <input
+          type="text"
+          placeholder="Please enter endpoint URL."
+          className="mt-1 p-2 border rounded-md"
+          value={endpointURL}
+          onChange={handleEndpointUrl}
+        />
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {dynamicForm.elements.map((element: FormElementType, i) => (
           <div key={i} className="flex flex-col">
