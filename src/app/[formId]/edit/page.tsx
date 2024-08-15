@@ -50,7 +50,7 @@ const EditPage = ({ params }: FormIdPageProps) => {
     return <div>Error: {error.message}</div>;
   }
 
-  return <div>{dynamicForm && <DynamicForm />}</div>;
+  return <div>{dynamicForm && <DynamicForm formId={formID} />}</div>;
 };
 
 export default EditPage;

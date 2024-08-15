@@ -44,10 +44,11 @@ export const insertFormData = async (formData: FormType) => {
 };
 
 export const updateFormDataWithNewUserID = async (
-  formData: FormData,
+  formData: FormType,
   userID: string,
   formID: string,
-  webhookURL: string
+  webhookURL: string,
+  formName: string
 ) => {
   return db
     .update(schema.forms)
@@ -55,6 +56,7 @@ export const updateFormDataWithNewUserID = async (
       formData: formData,
       userId: userID,
       webhookUrl: webhookURL,
+      formName: formName
     })
     .where(eq(schema.forms.formId, formID));
 };

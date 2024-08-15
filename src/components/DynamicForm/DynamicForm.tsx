@@ -2,7 +2,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { FormElementType, FormType, generateSchema } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import EditModal from "./EditModal";
 import generateUniqueId from "generate-unique-id";
 import { auth, clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
@@ -10,12 +10,16 @@ import { useAuth, useClerk } from "@clerk/nextjs";
 import { redirect } from "next/dist/server/api-utils";
 import { table } from "console";
 import { forms } from "@/app/db/schema";
+import { updateFormDataWithNewUserID } from "@/app/db";
 
+interface DynamicFormProps {
+  formId: string;
+}
 
-
-const DynamicForm: React.FC = () => {
+const DynamicForm = (props: DynamicFormProps) => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
-  const [endpointURL, setEndpointURL] = useState("");
+  const [endpointURL, setEndpointURL] = useState<string>();
+  const [formName, setFormName] = useState<string>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<
     FormType["elements"][number] | null
@@ -59,14 +63,17 @@ const DynamicForm: React.FC = () => {
   };
 
   const handleSaveForm = async () => {
-    //console.log("HERE!!!!!", sessionId);
-
-    setDynamicForm({elements: []})
-  
-    
-
     if (!isSignedIn) {
       openSignIn();
+    }
+    if (userId && endpointURL && formName) {
+      updateFormDataWithNewUserID(
+        dynamicForm,
+        userId,
+        props.formId,
+        endpointURL,
+        formName
+      );
     }
   };
 
@@ -106,8 +113,32 @@ const DynamicForm: React.FC = () => {
     setDynamicForm({ ...dynamicForm, elements: updatedElements });
   };
 
+  const handleFormName = (event: ChangeEvent<HTMLInputElement>) => {
+    setFormName(event.target.value);
+  };
+
+  const handleEndpointUrl = (event: ChangeEvent<HTMLInputElement>) => {
+    setEndpointURL(event.target.value);
+  };
+
   return (
     <div>
+      <div className="flex flex-row">
+        <input
+          type="text"
+          placeholder="Please enter form name."
+          className="mt-1 p-2 border rounded-md"
+          value={formName}
+          onChange={handleFormName}
+        />
+        <input
+          type="text"
+          placeholder="Please enter endpoint URL."
+          className="mt-1 p-2 border rounded-md"
+          value={endpointURL}
+          onChange={handleEndpointUrl}
+        />
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {dynamicForm.elements.map((element: FormElementType, i) => (
           <div key={i} className="flex flex-col">
