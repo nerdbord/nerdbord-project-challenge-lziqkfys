@@ -15,7 +15,7 @@ const DynamicFormContext = createContext<
 export const DynamicFormProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [dynamicForm, setDynamicForm] = useState<FormType>({elements: []});
+  const [dynamicForm, setDynamicForm] = useState<FormType>({ elements: []});
   const [isHydrated, setIsHydrated] = useState(false);
 
 

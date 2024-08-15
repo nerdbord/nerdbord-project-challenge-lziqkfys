@@ -1,14 +1,12 @@
+"use server";
 import { loadEnvConfig } from "@next/env";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import * as dotenv from "dotenv";
-// import { users, forms, formsRelations, submissions, submissionsRelations  } from "./schema";
-import * as schema from "./schema"; // Zawiera tabele users, forms, submissions
-
-
-// Read the .env file if it exists, or a file specified by the
-// dotenv_config_path parameter that's passed to Node.js
-// dotenv.config();
+import * as schema from "./schema";
+import { eq } from "drizzle-orm";
+import { FormType } from "@/types/types";
+import { redirect } from "next/navigation";
+import { useDynamicFormContext } from "@/context/DynamicFormContext";
 
 loadEnvConfig(process.cwd());
 
@@ -17,4 +15,46 @@ if (!process.env.DATABASE_URL) {
 }
 
 const sql = neon(process.env.DATABASE_URL);
-export const db = drizzle(sql, { schema });
+const db = drizzle(sql, { schema });
+
+export const dataBase = async () => {
+  return db.select().from(schema.forms);
+};
+
+export const getFormsByUserID = async (userID: string) => {
+  return db.select().from(schema.forms).where(eq(schema.forms.userId, userID));
+};
+
+export const getFormDataByFormID = async (formID: string) => {
+  return await db.select().from(schema.forms).where(eq(schema.forms.formId, formID));
+};
+
+export const insertFormData = async (formData: FormType) => {
+  const serverResponse = await db
+    .insert(schema.forms)
+    .values({
+      formData: formData,
+    })
+    .returning({
+      insertedID: schema.forms.formId,
+    });
+  console.log("RESPONSE! ", serverResponse);
+
+  redirect(`/${serverResponse[0].insertedID}/edit`);
+};
+
+export const updateFormDataWithNewUserID = async (
+  formData: FormData,
+  userID: string,
+  formID: string,
+  webhookURL: string
+) => {
+  return db
+    .update(schema.forms)
+    .set({
+      formData: formData,
+      userId: userID,
+      webhookUrl: webhookURL,
+    })
+    .where(eq(schema.forms.formId, formID));
+};

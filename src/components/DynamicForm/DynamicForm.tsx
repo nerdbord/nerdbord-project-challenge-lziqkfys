@@ -8,6 +8,10 @@ import generateUniqueId from "generate-unique-id";
 import { auth, clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { redirect } from "next/dist/server/api-utils";
+import { table } from "console";
+import { forms } from "@/app/db/schema";
+
+
 
 const DynamicForm: React.FC = () => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
@@ -20,6 +24,8 @@ const DynamicForm: React.FC = () => {
 
   const { isLoaded, userId, sessionId, isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
+
+  // const data = await db.select().from(forms);
 
   const { handleSubmit } = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -52,9 +58,11 @@ const DynamicForm: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveForm = () => {
-    console.log("HERE!!!!!", isSignedIn);
+  const handleSaveForm = async () => {
+    //console.log("HERE!!!!!", sessionId);
 
+    setDynamicForm({elements: []})
+  
     
 
     if (!isSignedIn) {
