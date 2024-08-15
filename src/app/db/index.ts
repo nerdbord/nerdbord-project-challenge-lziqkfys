@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { FormType } from "@/types/types";
 import { redirect } from "next/navigation";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
+import { Asap_Condensed } from "next/font/google";
 
 loadEnvConfig(process.cwd());
 
@@ -38,8 +39,6 @@ export const insertFormData = async (formData: FormType) => {
     .returning({
       insertedID: schema.forms.formId,
     });
-  console.log("RESPONSE! ", serverResponse);
-
   redirect(`/${serverResponse[0].insertedID}/edit`);
 };
 

@@ -7,6 +7,7 @@ import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { redirect } from "next/dist/server/api-utils";
 import { dataBase, insertFormData } from "./db";
 import { useRouter } from "next/router";
+import { error } from "console";
 
 export default function Home() {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
@@ -15,12 +16,17 @@ export default function Home() {
 
   const handleClick = async () => {
     setIsLoading(true);
-    const formJSON = await generateForm(prompt);
-
-    if (!formJSON) {
-      return console.error("Couldn't generate a form.");
+    try {
+      const formJSON = await generateForm(prompt);
+      if (!formJSON) {
+        throw new Error("Couldn't generate a form.");
+      }
+      await insertFormData(formJSON);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
-    await insertFormData(formJSON);
   };
 
   const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {

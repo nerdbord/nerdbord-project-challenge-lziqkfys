@@ -37,24 +37,24 @@ const DynamicForm = (props: DynamicFormProps) => {
   });
 
   const onSubmit = async (data: any) => {
-    // try {
-    //   const response = await fetch("https://submit-form.com/YKEFWFXpa", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(data),
-    //     //mode: "no-cors"
-    //   });
-    //   if (response.ok) {
-    //     alert("Form submitted successfully!");
-    //   } else {
-    //     alert("Failed to submit the form.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   alert("An error occurred while submitting the form.");
-    // }
+    try {
+      const response = await fetch("https://submit-form.com/YKEFWFXpa", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+        //mode: "no-cors"
+      });
+      if (response.ok) {
+        alert("Form submitted successfully!");
+      } else {
+        alert("Failed to submit the form.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while submitting the form.");
+    }
   };
 
   const handleEdit = (element: FormType["elements"][number]) => {
@@ -67,13 +67,17 @@ const DynamicForm = (props: DynamicFormProps) => {
       openSignIn();
     }
     if (userId && endpointURL && formName) {
-      updateFormDataWithNewUserID(
-        dynamicForm,
-        userId,
-        props.formId,
-        endpointURL,
-        formName
-      );
+      try {
+        await updateFormDataWithNewUserID(
+          dynamicForm,
+          userId,
+          props.formId,
+          endpointURL,
+          formName
+        );
+      } catch (error) {
+        console.error("Failed to update form data:", error);
+      }
     }
   };
 

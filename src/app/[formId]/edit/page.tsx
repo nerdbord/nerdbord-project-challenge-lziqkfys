@@ -40,7 +40,7 @@ const EditPage = ({ params }: FormIdPageProps) => {
     };
 
     fetchFormData();
-  }, []);
+  }, [userId, formID]);
 
   if (loading) {
     return <div>Loading...</div>;
