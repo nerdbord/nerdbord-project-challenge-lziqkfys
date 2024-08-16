@@ -1,8 +1,10 @@
-import { dataBase, getFormDataByFormID } from "../db";
-import { forms } from "../db/schema";
-import { eq } from "drizzle-orm";
-import { FormType } from "@/types/types";
+"use client";
 
+import { getFormDataByFormID } from "../db";
+import { FormType } from "@/types/types";
+import DisplayForm from "@/components/DisplayForm/DisplayForm";
+import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 interface FormIdPageProps {
   params: {
@@ -10,43 +12,55 @@ interface FormIdPageProps {
   };
 }
 
-const FormIdPage = async ({ params} : FormIdPageProps ) => {
+const FormIdPage = ({ params }: FormIdPageProps) => {
 
   const formID = params.formId;
-  const formData = await getFormDataByFormID(formID)
+  const { userId } = useAuth();
+  const [formData, setFormData] = useState<FormType | null>(null)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  if (!formData || formData.length === 0) {
-    return <div>Form not found</div>;
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        const fetchedFormData = await getFormDataByFormID(formID);
+        if (!fetchedFormData || fetchedFormData.length === 0) {
+          setError(new Error("Form not found"));
+          setLoading(false);
+          return
+        }
+
+        const formDetails = fetchedFormData[0]
+
+        if (formDetails.userId && userId !== formDetails.userId) {
+          setError(
+            new Error(
+              "This form does not belong to you."
+            )
+          );
+          setLoading(false);
+          return;
+        }
+        setFormData(formDetails.formData as FormType);
+        setLoading(false);
+      } catch (err) {
+        setError(err as Error);
+        setLoading(false);
+      }
+    };
+
+    fetchFormData();
+  }, [userId, formID]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  const { userId, formData: formElements, webhookUrl, createdAt} = formData[0];
-  console.log("FORM: ", formData[0].formData)
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
-  return (
-    <div className="flex flex-col items-center justify-center">
-      <h1>Form ID: {formID}</h1>
-      <ul>
-        <li>User ID: {userId}</li>
-        <li>Webhook URL: {webhookUrl}</li>
-        <li>Created At: {createdAt?.toLocaleString()}</li>
-      </ul>
-      <form className="w-full max-w-lg">
-        {formElements?.elements?.map((element: any, index: number) => (
-          <div key={index} className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {element.label}
-            </label>
-            <input
-              type={element.type}
-              placeholder={element.placeholder}
-              required={element.required}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-        ))}
-      </form>
-    </div>
-  );
+  return formData ? <DisplayForm formData={formData} formId={formID} /> : null
 };
 
 export default FormIdPage;
