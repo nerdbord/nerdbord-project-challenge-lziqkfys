@@ -4,7 +4,12 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 import { eq } from "drizzle-orm";
-import { FormType } from "@/types/types";
+import {
+  FormElementSchema,
+  FormElementType,
+  FormSchema,
+  FormType,
+} from "@/types/types";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 
@@ -51,7 +56,7 @@ export const insertFormData = async (formData: FormType) => {
 };
 
 export const updateFormDataWithNewUserID = async (
-  formData: FormType,
+  formData: FormElementType[],
   userID: string,
   formID: string,
   webhookURL: string,
