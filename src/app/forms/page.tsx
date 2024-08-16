@@ -14,6 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { redirect } from "next/navigation";
+import PencilIcon from "@/components/icons/PencilIcon";
+import TrashIcon from "@/components/icons/TrashIcon";
+import ShareIcon from "@/components/icons/ShareIcon";
 
 const FormsPage = () => {
   const { userId, isSignedIn } = useAuth();
@@ -23,11 +27,11 @@ const FormsPage = () => {
   const [formsList, setFormsList] = useState<FormType[]>();
 
   useEffect(() => {
+    if (!isSignedIn) {
+      redirect("/");
+    }
     const fetchFormData = async () => {
       try {
-        if (!userId) {
-          return null;
-        }
         const dbFormData = (await getFormsByUserID(userId)) as FormType[];
         setFormsList(dbFormData);
         setLoading(false);
@@ -42,22 +46,52 @@ const FormsPage = () => {
 
   return (
     <div>
+      <h1>Zapisane formularze</h1>
       <Table>
         <TableCaption>Forms of {userId}</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Form</TableHead>
-            <TableHead >Edit</TableHead>
-            <TableHead >Delete</TableHead>
-            <TableHead >Share</TableHead>
+            <TableHead className="text-right">Edit</TableHead>
+            <TableHead className="text-center">Delete</TableHead>
+            <TableHead className="text-left">Share</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {formsList?.map((form) => {
+          {formsList?.map((form, i) => {
             return (
-              <TableRow>
+              <TableRow key={i}>
                 <TableCell className="font-medium">{form.formName}</TableCell>
-                <TableCell >{<a href={`/${form.formId}/edit`}>edit</a>}</TableCell>
+                <TableCell>
+                  {
+                    <a
+                      className="flex justify-end"
+                      href={`/${form.formId}/edit`}
+                    >
+                      <PencilIcon />
+                    </a>
+                  }
+                </TableCell>
+                <TableCell>
+                  {
+                    <a
+                      className="flex justify-center"
+                      href={`/${form.formId}/edit`}
+                    >
+                      <TrashIcon />
+                    </a>
+                  }
+                </TableCell>
+                <TableCell>
+                  {
+                    <a
+                      className="flex justify-start"
+                      href={`/${form.formId}`}
+                    >
+                      <ShareIcon />
+                    </a>
+                  }
+                </TableCell>
               </TableRow>
             );
           })}
