@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import {
   ClerkProvider,
   SignInButton,
+  SignUpButton,
   SignedIn,
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
 import { DynamicFormProvider } from "@/context/DynamicFormContext";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
-const inter = Inter({ subsets: ["latin"] });
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,14 +31,29 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+          )}
+        >
           <DynamicFormProvider>
-            <header>
+            <header className="sticky top-0 flex h-16 items-center justify-between gap-4 bg-background px-4 md:px-6">
+              <Button variant="outline"><a href="/">Formatrix</a></Button>
               <SignedOut>
-                <SignInButton />
+                <div className="flex gap-4">
+                  <Button className="min-w-36">
+                    <SignInButton>Zaloguj</SignInButton>
+                  </Button>
+                  <Button variant="outline" className="min-w-36">
+                    <SignUpButton>Zarejestruj się</SignUpButton>
+                  </Button>
+                </div>
               </SignedOut>
               <SignedIn>
-                <UserButton />
+                <Button variant="outline">
+                  <a href="/forms">Panel użytkownika</a>
+                </Button>
               </SignedIn>
             </header>
             <main>{children}</main>

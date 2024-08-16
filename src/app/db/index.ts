@@ -4,10 +4,14 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 import { eq } from "drizzle-orm";
-import { FormType } from "@/types/types";
+import {
+  FormElementSchema,
+  FormElementType,
+  FormSchema,
+  FormType,
+} from "@/types/types";
 import { redirect } from "next/navigation";
-import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { Asap_Condensed } from "next/font/google";
+import { auth } from "@clerk/nextjs/server";
 
 loadEnvConfig(process.cwd());
 
@@ -23,18 +27,27 @@ export const dataBase = async () => {
 };
 
 export const getFormsByUserID = async (userID: string) => {
-  return db.select().from(schema.forms).where(eq(schema.forms.userId, userID));
+  return await db
+    .select()
+    .from(schema.forms)
+    .where(eq(schema.forms.userId, userID));
 };
 
 export const getFormDataByFormID = async (formID: string) => {
-  return await db.select().from(schema.forms).where(eq(schema.forms.formId, formID));
+  return await db
+    .select()
+    .from(schema.forms)
+    .where(eq(schema.forms.formId, formID));
 };
 
 export const insertFormData = async (formData: FormType) => {
+  const { userId } = auth();
   const serverResponse = await db
     .insert(schema.forms)
     .values({
-      formData: formData,
+      formData: formData.formData,
+      formName: formData.formName ? formData.formName : null,
+      userId: userId ? userId : null,
     })
     .returning({
       insertedID: schema.forms.formId,
@@ -43,7 +56,7 @@ export const insertFormData = async (formData: FormType) => {
 };
 
 export const updateFormDataWithNewUserID = async (
-  formData: FormType,
+  formData: FormElementType[],
   userID: string,
   formID: string,
   webhookURL: string,
@@ -55,7 +68,7 @@ export const updateFormDataWithNewUserID = async (
       formData: formData,
       userId: userID,
       webhookUrl: webhookURL,
-      formName: formName
+      formName: formName,
     })
     .where(eq(schema.forms.formId, formID));
 };
