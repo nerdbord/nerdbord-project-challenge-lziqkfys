@@ -8,6 +8,7 @@ import { redirect } from "next/dist/server/api-utils";
 import { dataBase, insertFormData } from "./db";
 import { useRouter } from "next/router";
 import { error } from "console";
+import UserFormsList from "@/components/UserFormsList/UserFormsList";
 
 export default function Home() {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
@@ -46,6 +47,7 @@ export default function Home() {
       >
         {isLoading ? "Loading..." : "Generate Form"}
       </button>
+      <UserFormsList />
     </div>
   );
 }
