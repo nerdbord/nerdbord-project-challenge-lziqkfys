@@ -4,17 +4,7 @@ import ForwardIcon from "@/components/icons/ForwardIcon";
 import LogoutIcon from "@/components/icons/LogoutIcon";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  ClerkProvider,
-  RedirectToUserProfile,
-  SignInButton,
-  SignOutButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-  useUser,
-} from "@clerk/nextjs";
-import { auth, User } from "@clerk/nextjs/server";
+import { RedirectToUserProfile, SignOutButton, useUser } from "@clerk/nextjs";
 import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useState } from "react";
 
@@ -24,10 +14,10 @@ export default function FormsLayout({
   children: React.ReactNode;
 }>) {
   const { user } = useUser();
-  const [redirect, setRedirect] = useState(false)
+  const [redirect, setRedirect] = useState(false);
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="mr-8">
+      <div className="pr-8 border-r">
         <div className="flex flex-row my-10 ml-6 gap-4">
           <Avatar className="size-16">
             <AvatarImage src={user?.imageUrl} alt={user?.fullName || ""} />
@@ -46,15 +36,17 @@ export default function FormsLayout({
             <ForwardIcon />
             Zapisane formulaże
           </Button>
-            <Button
-              variant="outline"
-              className="rounded-none gap-2 w-full flex flex-row justify-start"
-              onClick={() => {setRedirect(true)}}
-            >
-              <CogIcon />
-              Ustawienia konta
-              {redirect && <RedirectToUserProfile/>}
-            </Button>
+          <Button
+            variant="outline"
+            className="rounded-none gap-2 w-full flex flex-row justify-start"
+            onClick={() => {
+              setRedirect(true);
+            }}
+          >
+            <CogIcon />
+            Ustawienia konta
+            {redirect && <RedirectToUserProfile />}
+          </Button>
           <SignOutButton>
             <Button
               variant="outline"

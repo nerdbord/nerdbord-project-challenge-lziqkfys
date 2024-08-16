@@ -84,10 +84,7 @@ const FormsPage = () => {
                 </TableCell>
                 <TableCell>
                   {
-                    <a
-                      className="flex justify-start"
-                      href={`/${form.formId}`}
-                    >
+                    <a className="flex justify-start" href={`/${form.formId}`}>
                       <ShareIcon />
                     </a>
                   }

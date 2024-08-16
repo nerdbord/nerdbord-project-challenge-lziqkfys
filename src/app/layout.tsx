@@ -33,12 +33,12 @@ export default function RootLayout({
       <html lang="en">
         <body
           className={cn(
-            "min-h-screen bg-background font-sans antialiased",
+            "min-h-screen bg-background font-sans antialiased ",
             fontSans.variable
           )}
         >
           <DynamicFormProvider>
-            <header className="sticky top-0 flex h-16 items-center justify-between gap-4 bg-background px-4 md:px-6">
+            <header className="sticky top-0 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6">
               <Button variant="outline"><a href="/">Formatrix</a></Button>
               <SignedOut>
                 <div className="flex gap-4">
