@@ -24,14 +24,14 @@ const EditPage = ({ params }: FormIdPageProps) => {
   useEffect(() => {
     const fetchFormData = async () => {
       try {
-        const formData = await getFormDataByFormID(formID);       
-        if (formData[0].userId && userId !== formData[0].userId.toString()) {
+        const form = await getFormDataByFormID(formID);       
+        if (form[0].userId && userId !== form[0].userId.toString()) {
             
             setError(new Error("You're trying to edit a form which does not belong to you."))
             setLoading(false)
             return;
-        }
-        setDynamicForm(formData[0].formData as FormType);
+        }                
+        setDynamicForm(form[0] as FormType);
         setLoading(false);
       } catch (err) {
         setError(err as Error);

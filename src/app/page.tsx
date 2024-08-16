@@ -2,12 +2,9 @@
 
 import { ChangeEvent, useState } from "react";
 import generateForm from "../ai/generateForm";
-import DynamicForm from "../components/DynamicForm/DynamicForm";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { redirect } from "next/dist/server/api-utils";
-import { dataBase, insertFormData } from "./db";
-import { useRouter } from "next/router";
-import { error } from "console";
+import {  insertFormData } from "./db";
+
 
 export default function Home() {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();

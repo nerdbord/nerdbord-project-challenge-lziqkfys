@@ -22,8 +22,10 @@ const DynamicForm = (props: DynamicFormProps) => {
   const [formName, setFormName] = useState<string>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedElement, setSelectedElement] = useState<
-    FormType["elements"][number] | null
+    FormType["formData"][number] | null
   >(null);
+  
+
   const formSchema = generateSchema(dynamicForm);
 
   const { isLoaded, userId, sessionId, isSignedIn } = useAuth();
@@ -57,7 +59,7 @@ const DynamicForm = (props: DynamicFormProps) => {
     }
   };
 
-  const handleEdit = (element: FormType["elements"][number]) => {
+  const handleEdit = (element: FormType["formData"][number]) => {
     setSelectedElement(element);
     setIsModalOpen(true);
   };
@@ -81,20 +83,20 @@ const DynamicForm = (props: DynamicFormProps) => {
     }
   };
 
-  const handleSaveElement = (updatedElement: FormType["elements"][number]) => {
-    const updatedElements = dynamicForm.elements.map((el) =>
+  const handleSaveElement = (updatedElement: FormType["formData"][number]) => {
+    const updatedElements = dynamicForm.formData.map((el) =>
       el.fieldName === selectedElement?.fieldName ? updatedElement : el
     );
-    setDynamicForm({ ...dynamicForm, elements: updatedElements });
+    setDynamicForm({ ...dynamicForm, formData: updatedElements });
   };
 
   const handleRemoveElement = () => {
     if (!selectedElement) return;
 
-    const updatedElements = dynamicForm.elements.filter((el) => {
+    const updatedElements = dynamicForm.formData.filter((el) => {
       return el.fieldName !== selectedElement.fieldName;
     });
-    setDynamicForm({ ...dynamicForm, elements: updatedElements });
+    setDynamicForm({ ...dynamicForm, formData: updatedElements });
     setIsModalOpen(false);
   };
 
@@ -112,9 +114,9 @@ const DynamicForm = (props: DynamicFormProps) => {
       options: [{ option: "" }],
     };
 
-    const updatedElements = [...dynamicForm.elements, newElement];
+    const updatedElements = [...dynamicForm.formData, newElement];
 
-    setDynamicForm({ ...dynamicForm, elements: updatedElements });
+    setDynamicForm({ ...dynamicForm, formData: updatedElements });
   };
 
   const handleFormName = (event: ChangeEvent<HTMLInputElement>) => {
@@ -144,7 +146,7 @@ const DynamicForm = (props: DynamicFormProps) => {
         />
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {dynamicForm.elements.map((element: FormElementType, i) => (
+        {dynamicForm.formData.map((element: FormElementType, i) => (
           <div key={i} className="flex flex-col">
             <div className="flex flex-row justify-between">
               <label className="font-medium text-gray-700">
@@ -171,7 +173,7 @@ const DynamicForm = (props: DynamicFormProps) => {
             ) : (
               <input
                 type={element.type}
-                placeholder={element.placeholder}
+                placeholder={element.placeholder || undefined}
                 className="mt-1 p-2 border rounded-md"
               />
             )}
@@ -189,7 +191,7 @@ const DynamicForm = (props: DynamicFormProps) => {
         </button>
       }
 
-      {dynamicForm.elements.length > 0 && (
+      {dynamicForm.formData.length > 0 && (
         <button
           type="button"
           onClick={handleSaveForm}

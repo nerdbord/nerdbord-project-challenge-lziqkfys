@@ -3,7 +3,7 @@ import { z } from "zod";
 export const FormElementSchema = z.object({
   fieldName: z.string(),
   label: z.string(),
-  placeholder: z.string().optional(),
+  placeholder: z.string().nullable(),
   required: z.boolean(),
   type: z.union([
     z.literal("checkbox"),
@@ -22,32 +22,26 @@ export const FormElementSchema = z.object({
     z.literal("date"),
     z.literal("select"),
   ]),
-  options: z.array(z.object({ option: z.string() })).optional(),
+  options: z.array(z.object({ option: z.string() })).nullable(),
 });
-
 
 export const FormSchema = z.object({
-  elements: z.array(FormElementSchema),
+  id: z.number(),
+  formId: z.string(),
+  formName: z.string().nullable(),
+  formData: z.array(FormElementSchema),
+  userId: z.string().nullable(),
+  webhookUrl: z.string().nullable(),
+  createdAt: z.string().nullable(),
 });
 
-export const ExtendedFormSchema = z.object({
-  formID: z.string(),
-  formName: z.string(),
-  elements: z.array(FormElementSchema),
-  userID: z.string().optional(),
-  webhookUrl: z.string().optional(),
-  createdAt: z.string()
-})
-
-
 export type FormType = z.infer<typeof FormSchema>;
-export type ExtendedFormType = z.infer<typeof ExtendedFormSchema>;
 export type FormElementType = z.infer<typeof FormElementSchema>;
 
-export const generateSchema = (formData: FormType) => {
+export const generateSchema = (form: FormType) => {
   const schemaShape: Record<string, z.ZodTypeAny> = {};
 
-  formData.elements.forEach((element) => {
+  form.formData.forEach((element) => {
     let fieldSchema: z.ZodTypeAny;
 
     switch (element.type) {

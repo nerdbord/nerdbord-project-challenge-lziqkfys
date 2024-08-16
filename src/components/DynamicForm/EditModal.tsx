@@ -45,7 +45,7 @@ const EditModal: React.FC<EditModalProps> = ({
   }, [initialData, reset]);
 
   const onSubmit = (data: FormElementType) => {
-    const exisingFieldNames = dynamicForm.elements.map(
+    const exisingFieldNames = dynamicForm.formData.map(
       (element) => element.fieldName
     );
 
