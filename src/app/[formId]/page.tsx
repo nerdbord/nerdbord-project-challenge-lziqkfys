@@ -1,4 +1,4 @@
-import { dataBase } from "../db";
+import { dataBase, getFormDataByFormID } from "../db";
 import { forms } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { FormType } from "@/types/types";
@@ -10,26 +10,28 @@ interface FormIdPageProps {
   };
 }
 
-const FormIdPage = async ({ params }: { params: FormIdPageProps }) => {
+const FormIdPage = async ({ params} : FormIdPageProps ) => {
 
-  if (!form) {
+  const formID = params.formId;
+  const formData = await getFormDataByFormID(formID)
+
+  if (!formData || formData.length === 0) {
     return <div>Form not found</div>;
   }
 
-  const { formId, userId, formData, webhookUrl, createdAt, published } = form;
-  console.log("FORM: ", form)
+  const { userId, formData: formElements, webhookUrl, createdAt} = formData[0];
+  console.log("FORM: ", formData[0].formData)
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <h1>Form ID: {formId}</h1>
+      <h1>Form ID: {formID}</h1>
       <ul>
         <li>User ID: {userId}</li>
         <li>Webhook URL: {webhookUrl}</li>
-        <li>Created At: {new Date(createdAt).toLocaleString()}</li>
-        <li>Published: {published ? "Yes" : "No"}</li>
+        <li>Created At: {createdAt?.toLocaleString()}</li>
       </ul>
       <form className="w-full max-w-lg">
-        {form?.elements.map((element: any, index: number) => (
+        {formElements?.elements?.map((element: any, index: number) => (
           <div key={index} className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2">
               {element.label}
@@ -43,7 +45,6 @@ const FormIdPage = async ({ params }: { params: FormIdPageProps }) => {
           </div>
         ))}
       </form>
-      <pre></pre>
     </div>
   );
 };
