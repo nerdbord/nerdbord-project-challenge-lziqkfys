@@ -5,6 +5,7 @@ import { FormType } from "@/types/types";
 import DisplayForm from "@/components/DisplayForm/DisplayForm";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { useDynamicFormContext } from "@/context/DynamicFormContext";
 
 interface FormIdPageProps {
   params: {
@@ -13,10 +14,9 @@ interface FormIdPageProps {
 }
 
 const FormIdPage = ({ params }: FormIdPageProps) => {
-
   const formID = params.formId;
   const { userId } = useAuth();
-  const [formData, setFormData] = useState<FormType | null>(null)
+  const { dynamicForm, setDynamicForm } = useDynamicFormContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -27,21 +27,12 @@ const FormIdPage = ({ params }: FormIdPageProps) => {
         if (!fetchedFormData || fetchedFormData.length === 0) {
           setError(new Error("Form not found"));
           setLoading(false);
-          return
-        }
-
-        const formDetails = fetchedFormData[0]
-
-        if (formDetails.userId && userId !== formDetails.userId) {
-          setError(
-            new Error(
-              "This form does not belong to you."
-            )
-          );
-          setLoading(false);
           return;
         }
-        setFormData(formDetails.formData as FormType);
+
+        const formDetails = fetchedFormData[0];
+
+        setDynamicForm(formDetails as FormType);
         setLoading(false);
       } catch (err) {
         setError(err as Error);
@@ -50,7 +41,7 @@ const FormIdPage = ({ params }: FormIdPageProps) => {
     };
 
     fetchFormData();
-  }, [userId, formID]);
+  }, [formID]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -60,7 +51,7 @@ const FormIdPage = ({ params }: FormIdPageProps) => {
     return <div>Error: {error.message}</div>;
   }
 
-  return formData ? <DisplayForm formData={formData} formId={formID} /> : null
+  return <DisplayForm formId={formID} />;
 };
 
 export default FormIdPage;
