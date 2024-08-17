@@ -36,6 +36,7 @@ import PencilIcon from "@/components/icons/PencilIcon";
 import TrashIcon from "@/components/icons/TrashIcon";
 import ShareIcon from "@/components/icons/ShareIcon";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 
 const FormsPage = () => {
   const { userId, isSignedIn } = useAuth();
@@ -44,6 +45,7 @@ const FormsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [trashColour, setTrashColour] = useState(false);
   const [formsList, setFormsList] = useState<FormType[]>();
 
   useEffect(() => {
@@ -86,19 +88,11 @@ const FormsPage = () => {
       <AlertDialog>
         <Table>
           <TableCaption>Forms of {userId}</TableCaption>
-          {/* <TableHeader>
-            <TableRow>
-              <TableHead>Form</TableHead>
-              <TableHead className="text-right">Edit</TableHead>
-              <TableHead className="text-center">Delete</TableHead>
-              <TableHead className="text-left">Share</TableHead>
-            </TableRow>
-          </TableHeader> */}
           <TableBody className="border">
             {formsList?.map((form, i) => {
               return (
                 <TableRow key={i}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium hover:font-bold">
                     <a href={`/${form.formId}`}>{form.formName}</a>
                   </TableCell>
                   <TableCell>
@@ -132,6 +126,7 @@ const FormsPage = () => {
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               onClick={() => {
                                 handleDelete(form.formId);
                               }}

@@ -17,20 +17,23 @@ interface FormIdPageProps {
 const EditPage = ({ params }: FormIdPageProps) => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
   const formID = params.formId;
-  const {userId, isSignedIn} = useAuth()
+  const { userId, isSignedIn } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     const fetchFormData = async () => {
       try {
-        const form = await getFormDataByFormID(formID);       
+        const form = await getFormDataByFormID(formID);
         if (form[0].userId && userId !== form[0].userId.toString()) {
-            
-            setError(new Error("You're trying to edit a form which does not belong to you."))
-            setLoading(false)
-            return;
-        }                
+          setError(
+            new Error(
+              "You're trying to edit a form which does not belong to you."
+            )
+          );
+          setLoading(false);
+          return;
+        }
         setDynamicForm(form[0] as FormType);
         setLoading(false);
       } catch (err) {
@@ -50,7 +53,7 @@ const EditPage = ({ params }: FormIdPageProps) => {
     return <div>Error: {error.message}</div>;
   }
 
-  return <div>{dynamicForm && <DynamicForm formId={formID} />}</div>;
+  return <DynamicForm formId={formID} />;
 };
 
 export default EditPage;
