@@ -13,6 +13,7 @@ import { DynamicFormProvider } from "@/context/DynamicFormContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
+import StickerSmileyIcon from "@/components/icons/StickerSmileyIcon";
 
 const fontSans = FontSans({
   subsets: ["latin"],

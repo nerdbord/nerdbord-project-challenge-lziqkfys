@@ -1,5 +1,22 @@
 import { z } from "zod";
 
+export const formElementVariants = [
+  "checkbox",
+  "color",
+  "email",
+  "password",
+  "date",
+  "number",
+  "range",
+  "text",
+  "time",
+  "url",
+  "week",
+  "month",
+  "tel",
+  "select",
+];
+
 export const FormElementSchema = z.object({
   fieldName: z.string(),
   label: z.string(),

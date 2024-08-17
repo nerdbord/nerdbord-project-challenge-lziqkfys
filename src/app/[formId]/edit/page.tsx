@@ -1,6 +1,6 @@
 "use client";
 import { getFormDataByFormID } from "@/app/db";
-import DynamicForm from "@/components/DynamicForm/DynamicForm";
+import EditForm from "@/components/EditForm/EditForm";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { FormType } from "@/types/types";
 import { useAuth, useClerk } from "@clerk/nextjs";
@@ -53,7 +53,11 @@ const EditPage = ({ params }: FormIdPageProps) => {
     return <div>Error: {error.message}</div>;
   }
 
-  return <DynamicForm formId={formID} />;
+  return (
+    <div className="grid grid-cols-1">
+      <EditForm formId={formID} />
+    </div>
+  );
 };
 
 export default EditPage;
