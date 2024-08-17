@@ -11,8 +11,6 @@ export const formElementVariants = [
   "text",
   "time",
   "url",
-  "week",
-  "month",
   "tel",
   "select",
 ];
@@ -33,8 +31,6 @@ export const FormElementSchema = z.object({
     z.literal("text"),
     z.literal("time"),
     z.literal("url"),
-    z.literal("week"),
-    z.literal("month"),
     z.literal("tel"),
     z.literal("date"),
     z.literal("select"),

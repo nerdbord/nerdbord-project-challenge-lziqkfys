@@ -1,13 +1,22 @@
-import { useFieldArray, useForm } from "react-hook-form";
+"use client";
+
 import {
+  useFieldArray,
+  useForm,
+  Controller,
+  FieldElement,
+} from "react-hook-form";
+import {
+  FormElementSchema,
   FormElementType,
   formElementVariants,
+  FormSchema,
   FormType,
   generateSchema,
 } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import EditModal from "../DynamicForm/EditModal";
 import generateUniqueId from "generate-unique-id";
 import { auth, clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
@@ -35,6 +44,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
+import { Label } from "../ui/label";
+import { Checkbox } from "../ui/checkbox";
 
 interface EditFormProps {
   formId: string;
@@ -58,39 +70,48 @@ const EditForm = (props: EditFormProps) => {
   const { isLoaded, userId, sessionId, isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
 
-  // const data = await db.select().from(forms);
-
-  const { handleSubmit } = useForm<FormType>({
-    resolver: zodResolver(formSchema),
-    defaultValues: dynamicForm as FormType,
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    control,
+    setError,
+    formState: { errors },
+  } = useForm<FormType>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: dynamicForm,
   });
 
-  const onSubmit = async (data: any) => {
-    // try {
-    //   const response = await fetch("https://submit-form.com/YKEFWFXpa", {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(data),
-    //     //mode: "no-cors"
-    //   });
-    //   if (response.ok) {
-    //     alert("Form submitted successfully!");
-    //   } else {
-    //     alert("Failed to submit the form.");
-    //   }
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   alert("An error occurred while submitting the form.");
-    // }
+  const onSubmit = (data: any) => {    
+    console.log("ASDASDASD");
   };
 
-  const handleEdit = (updatedElement: FormType["formData"][number]) => {
-    const updatedElements = dynamicForm.formData.map((el) =>
-      el.fieldName === selectedElement?.fieldName ? updatedElement : el
-    );
-    setDynamicForm({ ...dynamicForm, formData: updatedElements });
+  const { fields, remove, insert } = useFieldArray<FormType>({
+    control,
+    name: "formData",
+    rules: { minLength: 1 },
+  });
+
+  const handleAddElement = () => {
+    const newElementName = generateUniqueId({
+      length: 10,
+      includeSymbols: ["@", "#"],
+    });
+    const newElement: FormElementType = {
+      fieldName: newElementName,
+      type: "text",
+      label: "Element label",
+      placeholder: "Element placeholder",
+      required: false,
+      options: [{ option: "" }],
+    };
+
+    insert(fields.length + 1, newElement);
+  };
+
+  const handleEdit = (chosenElement: FormType["formData"][number]) => {
+    setSelectedElement(chosenElement);
   };
 
   const handleSaveForm = async () => {
@@ -111,14 +132,22 @@ const EditForm = (props: EditFormProps) => {
       }
     }
   };
-
   const handleSaveElement = (updatedElement: FormType["formData"][number]) => {
     const updatedElements = dynamicForm.formData.map((el) =>
       el.fieldName === selectedElement?.fieldName ? updatedElement : el
     );
     setDynamicForm({ ...dynamicForm, formData: updatedElements });
   };
-
+  const handleFieldChange = (index: number, field: string, newData: string) => {
+    setDynamicForm((prevForm) => {
+      const updatedFormData = [...prevForm.formData];
+      updatedFormData[index] = {
+        ...updatedFormData[index],
+        [field]: newData,
+      };
+      return { ...prevForm, formData: updatedFormData };
+    });
+  };
   const handleRemoveElement = () => {
     if (!selectedElement) return;
 
@@ -128,30 +157,9 @@ const EditForm = (props: EditFormProps) => {
     setDynamicForm({ ...dynamicForm, formData: updatedElements });
     setIsModalOpen(false);
   };
-
-  const handleAddElement = () => {
-    const newElementName = generateUniqueId({
-      length: 10,
-      includeSymbols: ["@", "#"],
-    });
-    const newElement: FormElementType = {
-      fieldName: newElementName,
-      type: "text",
-      label: "Element label",
-      placeholder: "Element placeholder",
-      required: false,
-      options: [{ option: "" }],
-    };
-
-    const updatedElements = [...dynamicForm.formData, newElement];
-
-    setDynamicForm({ ...dynamicForm, formData: updatedElements });
-  };
-
   const handleFormName = (event: ChangeEvent<HTMLInputElement>) => {
     setFormName(event.target.value);
   };
-
   const handleEndpointUrl = (event: ChangeEvent<HTMLInputElement>) => {
     setEndpointURL(event.target.value);
   };
@@ -159,173 +167,117 @@ const EditForm = (props: EditFormProps) => {
   return (
     <div className="justify-self-center w-full max-w-4xl">
       <h1 className="mb-16">Edytujesz formularz "{dynamicForm.formName}"</h1>
-
-      <Table>
-        <TableCaption>Form {dynamicForm.formId}</TableCaption>
-        <TableBody>
-          <TableRow className="border">
-            <TableCell className="font-medium">
-              <div className="flex flex-col">
-                Form name
-                <Input
-                  type="text"
-                  placeholder="Please enter your form name."
-                  value={formName}
-                  onChange={handleFormName}
-                />
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex flex-col">
-                Webhook URL
-                <Input
-                  type="text"
-                  placeholder="Please enter endpoint URL"
-                  className="mt-1 p-2 border rounded-md"
-                  value={endpointURL}
-                  onChange={handleEndpointUrl}
-                />
-              </div>
-            </TableCell>
-          </TableRow>
-          {dynamicForm.formData.map((element, i) => {
-            return (
-              <TableRow key={i} className="border">
-                <TableCell className="w-full">
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-col">
-                      Field Name
-                      <Input placeholder={element.fieldName} />
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Table>
+          <TableCaption>Form {dynamicForm.formId}</TableCaption>
+          <TableBody>
+            <TableRow className="border">
+              <TableCell className="font-medium">
+                <div className="flex flex-col">
+                  Form name
+                  <Input
+                    type="text"
+                    {...register("formName")}
+                    placeholder="Please enter your form name."
+                    value={formName}
+                    onChange={handleFormName}
+                  />
+                  {errors.formName && <span>{errors.formName.message}</span>}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex flex-col">
+                  Webhook URL
+                  <Input
+                    type="text"
+                    {...register("webhookUrl")}
+                    placeholder="Please enter endpoint URL"
+                    value={endpointURL}
+                    onChange={handleEndpointUrl}
+                  />
+                  {errors.webhookUrl && (
+                    <span>{errors.webhookUrl.message}</span>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+            {fields.map((field, i) => {
+              return (
+                <TableRow key={i} className="border">
+                  <TableCell>
+                    <div className="flex flex-row justify-between my-4">
+                      <div className="flex flex-col">
+                        <Label className="mb-2">Field Name</Label>
+                        <Input
+                          type="text"
+                          placeholder="Field element name"
+                          {...register(`formData.${i}.fieldName`)}
+                          onChange={(e) => {
+                            handleFieldChange(i, "fieldName", e.target.value);
+                          }}
+                        />
+                        {errors.formData?.[i]?.fieldName && (
+                          <span className="text-red-500">
+                            {errors.formData[i].fieldName?.message}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <Label className="mb-2">Field type</Label>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            <Button variant="outline">{field.type}</Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            {formElementVariants.map((typeVariant) => {
+                              return (
+                                <DropdownMenuItem
+                                  key={typeVariant}
+                                  onClick={() => {
+                                    handleFieldChange(i, "type", typeVariant);
+                                  }}
+                                >
+                                  {typeVariant}
+                                </DropdownMenuItem>
+                              );
+                            })}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      Field type
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          {element.type}
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          {formElementVariants.map((typeVariant) => {
-                            return (
-                              <DropdownMenuItem
-                                key={typeVariant}
-                                onClick={() => {
-                                  console.log("AHsdjahsdjhasjdhj", typeVariant);
-                                  
-                                  handleEdit(element);
-                                }}
-                              >
-                                {typeVariant}
-                              </DropdownMenuItem>
-                            );
-                          })}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-col">
-                      Field label
-                      <Input placeholder={element.label} />
-                    </div>
-                    <div>
-                      Is required?
-                      <Input type="checkbox" placeholder={element.type} />
-                    </div>
-                  </div>
-                  {element.type === "select" && (
                     <div className="flex flex-row justify-between">
                       <div className="flex flex-col">
-                        Field label
-                        <Input placeholder={element.label} />
+                        <Label className="mb-2">Field label</Label>
+                        <Input
+                          placeholder="Field element label"
+                          value={field.label}
+                          onChange={(e) => {
+                            handleFieldChange(i, "label", e.target.value);
+                          }}
+                        />
                       </div>
-                      <div>
-                        Is required?
-                        <Input type="checkbox" placeholder={element.type} />
+                      <div className="flex flex-col items-center">
+                        <Label className="mb-4">Is required?</Label>
+                        <Checkbox></Checkbox>
                       </div>
                     </div>
-                  )}
-                </TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-
-      {/* <div className="flex flex-row mt-16">
-        <input
-          type="text"
-          placeholder="Please enter endpoint URL."
-          className="mt-1 p-2 border rounded-md"
-          value={endpointURL}
-          onChange={handleEndpointUrl}
-        />
-      </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {dynamicForm.formData.map((element: FormElementType, i) => (
-          <div key={i} className="flex flex-col">
-            <div className="flex flex-row justify-between">
-              <label className="font-medium text-gray-700">
-                {element.label}{" "}
-                {element.required && <span className="text-red-500">*</span>}
-              </label>
-              <button
-                type="button"
-                onClick={() => {
-                  handleEdit(element);
-                }}
-              >
-                edit
-              </button>
-            </div>
-            {element.type === "select" && element.options ? (
-              <select className="mt-1 p-2 border rounded-md">
-                {element.options.map((option, idx) => (
-                  <option key={idx} value={option.option}>
-                    {option.option}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type={element.type}
-                placeholder={element.placeholder || undefined}
-                className="mt-1 p-2 border rounded-md"
-              />
-            )}
-          </div>
-        ))}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+        <Button type="button" onClick={() => {console.log(errors);
+        }}>SAVE FORM</Button>
+        <Button
+          onClick={() => {
+            handleAddElement();
+          }}
+        >
+          ADD
+        </Button>
       </form>
-
-      {
-        <button
-          type="button"
-          className="px-5 py-2.5 rounded-full text-white text-sm tracking-wider font-medium border border-current outline-none bg-green-700 hover:bg-green-800 active:bg-green-700"
-          onClick={handleAddElement}
-        >
-          Add element
-        </button>
-      }
-
-      {dynamicForm.formData.length > 0 && (
-        <button
-          type="button"
-          onClick={handleSaveForm}
-          className="px-5 py-2.5 rounded-full text-white text-sm tracking-wider font-medium border border-current outline-none bg-green-700 hover:bg-green-800 active:bg-green-700"
-        >
-          Save form
-        </button>
-      )}
-
-      {selectedElement && (
-        <EditModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onSave={handleSaveElement}
-          onRemove={handleRemoveElement}
-          initialData={selectedElement}
-        />
-      )} */}
     </div>
   );
 };
