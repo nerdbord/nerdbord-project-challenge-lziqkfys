@@ -41,7 +41,8 @@ export type FormElementType = z.infer<typeof FormElementSchema>;
 export const generateSchema = (form: FormType) => {
   const schemaShape: Record<string, z.ZodTypeAny> = {};
 
-  form.formData.forEach((element) => {
+  // Array.from(form.formData).forEach((element) => {
+    form.formData.forEach((element) => {
     let fieldSchema: z.ZodTypeAny;
 
     switch (element.type) {
