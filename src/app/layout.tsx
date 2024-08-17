@@ -12,6 +12,7 @@ import {
 import { DynamicFormProvider } from "@/context/DynamicFormContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -56,6 +57,7 @@ export default function RootLayout({
                 </Button>
               </SignedIn>
             </header>
+            <Toaster/>
             <main>{children}</main>
           </DynamicFormProvider>
         </body>
