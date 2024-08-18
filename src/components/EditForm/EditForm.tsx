@@ -1,13 +1,6 @@
 "use client";
-
+import { useFieldArray, useForm } from "react-hook-form";
 import {
-  useFieldArray,
-  useForm,
-  Controller,
-  FieldElement,
-} from "react-hook-form";
-import {
-  FormElementSchema,
   FormElementType,
   formElementVariants,
   FormSchema,
@@ -16,44 +9,19 @@ import {
 } from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
-import { ChangeEvent, useEffect, useState } from "react";
-import EditModal from "../DynamicForm/EditModal";
+import { useState } from "react";
 import generateUniqueId from "generate-unique-id";
-import { auth, clerkClient, clerkMiddleware } from "@clerk/nextjs/server";
 import { useAuth, useClerk } from "@clerk/nextjs";
-import { redirect } from "next/dist/server/api-utils";
-import { table } from "console";
-import { forms } from "@/app/db/schema";
 import { updateFormDataWithNewUserID } from "@/app/db";
-
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
+import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { Input } from "../ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { Button } from "../ui/button";
-import { Label } from "../ui/label";
 import { Checkbox } from "../ui/checkbox";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
-  SelectGroup,
-  SelectLabel,
   SelectItem,
 } from "@/components/ui/select";
 import {
@@ -65,6 +33,25 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import OptionsFieldArray from "./OptionsFieldArray";
+import TrashIcon from "../icons/TrashIcon";
+import React from "react";
+import ArrowIconLeft from "../icons/ArrowIconLeft";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { PlusIcon } from "lucide-react";
+import PlusCircleIcon from "../icons/PlusCircleIcon";
+import Spinner from "../icons/Spinner";
+import { redirect } from "next/navigation";
 
 interface EditFormProps {
   formId: string;
@@ -72,16 +59,8 @@ interface EditFormProps {
 
 const EditForm = (props: EditFormProps) => {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
-  const initialForm: FormType = JSON.parse(JSON.stringify(dynamicForm));
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedElement, setSelectedElement] = useState<
-    FormType["formData"][number] | null
-  >(null);
-
-  const formSchema = generateSchema(dynamicForm);
-
-  const { isLoaded, userId, sessionId, isSignedIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { userId, isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
 
   const form = useForm<FormType>({
@@ -100,8 +79,28 @@ const EditForm = (props: EditFormProps) => {
   } = form;
 
   const onSubmit = (data: FormType) => {
-    console.log("DYNADYNADYNADYNA", dynamicForm);
-    console.log("DATADATADATADATA", data);
+    setIsLoading(true);
+    const handleSaveDataToServer = async () => {
+      if (!isSignedIn) {
+        openSignIn();
+      }
+      if (userId && data.webhookUrl && data.formName) {
+        try {
+          await updateFormDataWithNewUserID(
+            data.formData,
+            userId,
+            props.formId,
+            data.webhookUrl,
+            data.formName
+          );
+        } catch (error) {
+          console.error("Failed to update form data:", error);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    handleSaveDataToServer();
   };
 
   const { fields, remove, insert } = useFieldArray<FormType>({
@@ -127,71 +126,34 @@ const EditForm = (props: EditFormProps) => {
     insert(fields.length + 1, newElement);
   };
 
-  // const handleEdit = (chosenElement: FormType["formData"][number]) => {
-  //   setSelectedElement(chosenElement);
-  // };
-
-  // const handleSaveForm = async () => {
-  //   if (!isSignedIn) {
-  //     openSignIn();
-  //   }
-  //   if (userId && endpointURL && formName) {
-  //     try {
-  //       await updateFormDataWithNewUserID(
-  //         dynamicForm.formData,
-  //         userId,
-  //         props.formId,
-  //         endpointURL,
-  //         formName
-  //       );
-  //     } catch (error) {
-  //       console.error("Failed to update form data:", error);
-  //     }
-  //   }
-  // };
-  // const handleSaveElement = (updatedElement: FormType["formData"][number]) => {
-  //   const updatedElements = dynamicForm.formData.map((el) =>
-  //     el.fieldName === selectedElement?.fieldName ? updatedElement : el
-  //   );
-  //   setDynamicForm({ ...dynamicForm, formData: updatedElements });
-  // };
-  const handleFieldChange = (index: number, field: string, newData: string) => {
-    setDynamicForm((prevForm) => {
-      const updatedFormData = [...prevForm.formData];
-      updatedFormData[index] = {
-        ...updatedFormData[index],
-        [field]: newData,
-      };
-      return { ...prevForm, formData: updatedFormData };
-    });
-  };
-  // const handleRemoveElement = () => {
-  //   if (!selectedElement) return;
-
-  //   const updatedElements = dynamicForm.formData.filter((el) => {
-  //     return el.fieldName !== selectedElement.fieldName;
-  //   });
-  //   setDynamicForm({ ...dynamicForm, formData: updatedElements });
-  //   setIsModalOpen(false);
-  // };
+  if (isLoading) {
+    return <Spinner />;
+  }
 
   return (
     <div className="justify-self-center w-full max-w-4xl">
-      <h1 className="mb-16">Edytujesz formularz "{dynamicForm.formName}"</h1>
-
+      <h1 className="pt-8 mb-16 text-4xl text-center font-extrabold">
+        <Button variant="outline" className="m-5">
+          <a href="/forms">
+            <ArrowIconLeft />
+          </a>
+        </Button>
+        Edytujesz formularz "{dynamicForm.formName}"
+      </h1>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Table>
-            <TableCaption>Form {dynamicForm.formId}</TableCaption>
             <TableBody>
               <TableRow className="border">
-                <TableCell className="font-medium">
+                <TableCell className="font-medium pt-8 pl-11">
                   <FormField
                     control={control}
                     name="formName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Form Name</FormLabel>
+                        <FormLabel className="text-xl pb-4">
+                          Form Name
+                        </FormLabel>
                         <FormControl>
                           <Input
                             placeholder=""
@@ -205,13 +167,13 @@ const EditForm = (props: EditFormProps) => {
                     )}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="font-medium pt-8 pr-11">
                   <FormField
                     control={control}
                     name="webhookUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Webhook URL</FormLabel>
+                        <FormLabel className="text-xl">Webhook URL</FormLabel>
                         <FormControl>
                           <Input
                             placeholder=""
@@ -219,7 +181,7 @@ const EditForm = (props: EditFormProps) => {
                             value={field.value || undefined}
                           />
                         </FormControl>
-                        <FormDescription>This is WEBHOOK URL</FormDescription>
+                        <FormDescription>This is webhook url</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -227,15 +189,21 @@ const EditForm = (props: EditFormProps) => {
                 </TableCell>
               </TableRow>
               {fields.map((thisField, i) => (
-                <TableRow className="border">
-                  {
-                    <div className="grid grid-cols-2">
-                      <TableCell>
+                <React.Fragment key={i}>
+                  <AlertDialog key={i}>
+                    <TableRow
+                      key={i}
+                      className={`border-l border-r border-t ${
+                        watch(`formData.${i}.type`) === "select" && "border-b-0"
+                      }`}
+                    >
+                      <TableCell className="w-1/2 align-top pt-8 pl-11">
+                        <h1 className="text-xl mb-8">{i + 1}.</h1>
                         <FormField
                           control={control}
                           name={`formData.${i}.fieldName`}
                           render={({ field }) => (
-                            <FormItem>
+                            <FormItem className="mb-8">
                               <FormLabel>Field element name</FormLabel>
                               <FormControl>
                                 <Input
@@ -276,104 +244,104 @@ const EditForm = (props: EditFormProps) => {
                           )}
                         />
                       </TableCell>
-                      <TableCell>
-                        <div>
-                          <FormField
-                            control={control}
-                            name={`formData.${i}.label`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Field label</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    placeholder=""
-                                    {...field}
-                                    value={field.value}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={control}
-                            name={`formData.${i}.required`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value}
-                                    onChange={field.onChange}
-                                  />
-                                </FormControl>
-                                <FormLabel className="ml-2">
-                                  Field required?
-                                </FormLabel>
-                              </FormItem>
-                            )}
-                          />
+                      <TableCell className="w-1/2 align-top pt-8 pr-11">
+                        <div className="flex flex-row justify-end mb-8 pr-11">
+                          <AlertDialogTrigger>
+                            <div className="cursor-pointer mt-1">
+                              <TrashIcon />
+                            </div>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete your account and remove your
+                                data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-red-500 hover:bg-red-300"
+                                onClick={() => remove(i)}
+                              >
+                                Continue
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
                         </div>
-                        {watch(`formData.${i}.type`) === "select" && (
-                          <FormField
-                            control={control}
-                            name={`formData.${i}.options`}
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormControl>
-                                  <Input
+                        <FormField
+                          control={control}
+                          name={`formData.${i}.label`}
+                          render={({ field }) => (
+                            <FormItem className=" mb-8 pr-11">
+                              <FormLabel>Field label</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder=""
                                   {...field}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-                        )}
+                                  value={field.value}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={control}
+                          name={`formData.${i}.required`}
+                          render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                              <FormLabel className="mb-2">
+                                Field required?
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="checkbox"
+                                  className="accent-black"
+                                  checked={field.value}
+                                  onChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
                       </TableCell>
-                    </div>
-                  }
-                </TableRow>
+                    </TableRow>
+                    {watch(`formData.${i}.type`) === "select" && (
+                      <TableRow className="border-l border-r border-b">
+                        <TableCell colSpan={2}>
+                          <OptionsFieldArray control={control} index={i} />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </AlertDialog>
+                </React.Fragment>
               ))}
-
-              {/* <TableRow>
-                <FormField
-                  control={control}
-                  name="formData"
-                  render={({ field }) => (
-                    <TableCell>
-                      {field.value.map((formElement, i) => {
-                        return (
-                          <FormItem key={i}>
-                            <FormLabel>{formElement.fieldName}</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder=""
-                                {...field}
-                                value={formElement.fieldName || undefined}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        );
-                      })}
-                    </TableCell>
-                  )}
-                />
-              </TableRow> */}
             </TableBody>
           </Table>
-          <Button
-            type="submit"
-            onClick={() => {
-              console.log(errors);
-            }}
-          >
-            SAVE FORM
-          </Button>
-          <Button
-            onClick={() => {
-              handleAddElement();
-            }}
-          >
-            ADD
-          </Button>
+          <div className="flex flex-col items-center">
+            <div
+              className="m-5 cursor-pointer"
+              onClick={() => {
+                handleAddElement();
+              }}
+            >
+              <PlusCircleIcon />
+            </div>
+            <Button
+              className="m-5"
+              disabled={isLoading}
+              type="submit"
+              onClick={() => {
+                console.log(errors);
+              }}
+            >
+              SAVE FORM
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
@@ -381,152 +349,3 @@ const EditForm = (props: EditFormProps) => {
 };
 
 export default EditForm;
-
-// <div className="justify-self-center w-full max-w-4xl">
-// <h1 className="mb-16">Edytujesz formularz "{dynamicForm.formName}"</h1>
-// <form onSubmit={handleSubmit(onSubmit)} noValidate>
-//   <Table>
-//     <TableCaption>Form {dynamicForm.formId}</TableCaption>
-//     <TableBody>
-//       <TableRow className="border">
-//         <TableCell className="font-medium">
-//           <div className="flex flex-col">
-//             Form name
-//             <Input
-//               type="text"
-//               {...register("formName")}
-//               placeholder="Please enter your form name."
-//               value={watch("formName") || ""}
-//             />
-//             {errors.formName && (
-//               <span className="text-red-600">
-//                 {errors.formName.message}
-//               </span>
-//             )}
-//           </div>
-//         </TableCell>
-//         <TableCell>
-//           <div className="flex flex-col">
-//             Webhook URL
-//             <Input
-//               type="url"
-//               {...register("webhookUrl")}
-//               placeholder="Please enter endpoint URL"
-//               value={watch("webhookUrl") || ""}
-//             />
-//             {errors.webhookUrl && (
-//               <span className="text-red-600">
-//                 {errors.webhookUrl.message}
-//               </span>
-//             )}
-//           </div>
-//         </TableCell>
-//       </TableRow>
-//       {fields.map((field, i) => {
-//         return (
-//           <TableRow key={i} className="border">
-//             <TableCell>
-//               <div className="flex flex-row justify-between my-4">
-//                 <div className="flex flex-col">
-//                   <Label className="mb-2">Field Name</Label>
-//                   <Input
-//                     type="text"
-//                     placeholder="Field element name"
-//                     {...register(`formData.${i}.fieldName`)}
-//                     // onChange={(e) => {
-//                     //   handleFieldChange(i, "fieldName", e.target.value);
-//                     // }}
-//                     value={watch(`formData.${i}.fieldName`)}
-//                   />
-//                   {errors.formData?.[i]?.fieldName && (
-//                     <span className="text-red-600">
-//                       {errors.formData[i].fieldName?.message}
-//                     </span>
-//                   )}
-//                 </div>
-//                 <div className="flex flex-col">
-//                   <Label className="mb-2">Field type</Label>
-//                   {/* <DropdownMenu>
-//                     <DropdownMenuTrigger>
-//                       <Button variant="outline">
-//                         {watch(`formData.${i}.type`)}
-//                       </Button>
-//                     </DropdownMenuTrigger>
-//                     <DropdownMenuContent>
-//                       {formElementVariants.map((typeVariant) => {
-//                         return (
-//                           <DropdownMenuItem
-//                             key={typeVariant}
-//                             onClick={() => {
-//                               handleFieldChange(i, "type", typeVariant);
-//                             }}
-//                           >
-//                             {typeVariant}
-//                           </DropdownMenuItem>
-//                         );
-//                       })}
-//                     </DropdownMenuContent>
-//                   </DropdownMenu> */}
-//                   <Select>
-//                     <SelectTrigger className="w-[180px]">
-//                       <Button variant="outline">
-//                         <SelectValue
-//                           placeholder={watch(`formData.${i}.type`)}
-//                         />
-//                       </Button>
-//                     </SelectTrigger>
-//                     <SelectContent>
-//                       <SelectGroup>
-//                         <SelectLabel>Form element types</SelectLabel>
-//                         {formElementVariants.map((typeVariant) => {
-//                           return (
-//                             <SelectItem value={typeVariant}>
-//                               {typeVariant}
-//                             </SelectItem>
-//                           );
-//                         })}
-//                       </SelectGroup>
-//                     </SelectContent>
-//                   </Select>
-//                 </div>
-//               </div>
-//               <div className="flex flex-row justify-between">
-//                 <div className="flex flex-col">
-//                   <Label className="mb-2">Field label</Label>
-//                   <Input
-//                     placeholder="Field element label"
-//                     value={watch(`formData.${i}.label`)}
-//                     {...register(`formData.${i}.label`)}
-//                   />
-//                 </div>
-//                 <div className="flex flex-col items-center">
-//                   <Label className="mb-4">Is required?</Label>
-//                   <Checkbox
-//                     checked={watch(`formData.${i}.required`)}
-//                   ></Checkbox>
-//                 </div>
-//               </div>
-//             </TableCell>
-//             <TableCell></TableCell>
-//           </TableRow>
-//         );
-//       })}
-//     </TableBody>
-//   </Table>
-//   <Button
-//     type="submit"
-//     onClick={() => {
-//       console.log(errors);
-//     }}
-//   >
-//     SAVE FORM
-//   </Button>
-//   <Button
-//     onClick={() => {
-//       handleAddElement();
-//     }}
-//   >
-//     ADD
-//   </Button>
-// </form>
-// </div>

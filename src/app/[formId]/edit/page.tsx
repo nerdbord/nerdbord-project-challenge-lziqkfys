@@ -1,6 +1,7 @@
 "use client";
 import { getFormDataByFormID } from "@/app/db";
 import EditForm from "@/components/EditForm/EditForm";
+import Spinner from "@/components/icons/Spinner";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { FormType } from "@/types/types";
 import { useAuth, useClerk } from "@clerk/nextjs";
@@ -41,12 +42,18 @@ const EditPage = ({ params }: FormIdPageProps) => {
         setLoading(false);
       }
     };
-
+    setLoading(true)
     fetchFormData();
   }, [userId, formID]);
+  
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="text-center my-20">
+        <Spinner />
+        <h1 className=" mt-5 text-4xl font-extrabold">Loading...</h1>
+      </div>
+    );
   }
 
   if (error) {
