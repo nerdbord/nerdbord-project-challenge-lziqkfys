@@ -71,7 +71,7 @@ const DynamicForm = (props: DynamicFormProps) => {
     if (userId && endpointURL && formName) {
       try {
         await updateFormDataWithNewUserID(
-          dynamicForm,
+          dynamicForm.formData,
           userId,
           props.formId,
           endpointURL,

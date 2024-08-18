@@ -6,8 +6,7 @@ import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { insertFormData } from "./db";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea"
-
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Home() {
   const { dynamicForm, setDynamicForm } = useDynamicFormContext();
@@ -44,6 +43,7 @@ export default function Home() {
         </h3>
         <div className="flex w-full items-center justify-between gap-16">
           <Textarea
+            className="resize-none"
             placeholder="Przykład prompta: Jako organizator spotkania chcę dowiedzieć się kto przyjdzie, kto będzie pił alkohol, kto nie je mięsa."
             value={prompt}
             onChange={handleOnChange}
@@ -51,7 +51,6 @@ export default function Home() {
           />
 
           <Button
-            
             type="submit"
             onClick={handleClick}
             className="px-4 py-2 w-[166px]"
