@@ -13,7 +13,7 @@ const footerLinks = [
     label: "Viera",
   },
   {
-    href: "",
+    href: "https://linkedin.com/in/julia-dutka-532a3a207",
     label: "Julia",
   },
   {

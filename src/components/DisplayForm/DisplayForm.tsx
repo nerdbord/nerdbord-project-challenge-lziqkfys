@@ -37,9 +37,9 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   const elements = dynamicForm.formData || [];
   const formSchema = generateSchema(dynamicForm);
 
-  const form = useForm<FormType>({
+  // const form = useForm<FormType>({
+    const form = useForm({
     resolver: zodResolver(formSchema),
-    // resolver: zodResolver(FormSchema),
     // defaultValues: dynamicForm as FormType,
     defaultValues: dynamicForm,
   });
@@ -54,7 +54,7 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   const onSubmit = async (data: any) => {
     try {
       // const response = await fetch(dynamicForm.webhookUrl as string, {
-      const response = await fetch("https://submit-form.com/kGteNP1Hj", {
+      const response = await fetch(dynamicForm.webhookUrl || "https://submit-form.com/kGteNP1Hj", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
