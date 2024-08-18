@@ -44,8 +44,8 @@ export const FormSchema = z.object({
   formName: z.string().nullable(),
   formData: z.array(FormElementSchema),
   userId: z.string().nullable(),
-  webhookUrl: z.string().nullable(),
-  createdAt: z.string().nullable(),
+  webhookUrl: z.string().url().nullable(),
+  createdAt: z.union([z.string(),z.date()]).nullable()
 });
 
 export type FormType = z.infer<typeof FormSchema>;

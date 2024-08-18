@@ -16,7 +16,7 @@ export default function FormsLayout({
   const { user } = useUser();
   const [redirect, setRedirect] = useState(false);
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] z-40">
       <div className="pr-8 border-r">
         <div className="flex flex-row my-10 ml-6 gap-4">
           <Avatar className="size-16">
