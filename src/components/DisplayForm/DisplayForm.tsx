@@ -74,8 +74,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center">
-      <h1 className="mb-16">
+    <div className="flex flex-col items-center justify-center px-14 py-14">
+      <h1 className="mb-8 mt-14 text-3xl font-semibold">
         To jest nazwa formularza: {dynamicForm.formName}
       </h1>
       <Form {...form}>
@@ -115,7 +115,7 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
               ))}
             </TableBody>
           </Table>
-          {elements.map((element: FormElementType, index: number) => (
+          {/* {elements.map((element: FormElementType, index: number) => (
             <div key={index} className="mb-4 bg-orange-400">
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 {element.label}
@@ -128,8 +128,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               />
             </div>
-          ))}
-          <Button type="submit">Send</Button>
+          ))} */}
+          <Button type="submit" className="mt-12">Wyślij</Button>
         </form>
       </Form>
     </div>
