@@ -34,7 +34,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center pl-[348px] pr-[348px] py-[240px]">
+    <main className="flex flex-col items-center justify-center px-[348px] pt-[138px] pb-[130px]">
       <section className="flex flex-col items-start justify-center max-w-[743px]">
         <h1 className="text-5xl font-extrabold mb-10">
           Twórz formularze z pomocą prostego polecenia!
@@ -54,7 +54,7 @@ export default function Home() {
             
             type="submit"
             onClick={handleClick}
-            className="px-4 py-2"
+            className="px-4 py-2 w-[166px]"
             // className={`px-5 py-2.5 rounded-full text-white text-sm tracking-wider font-medium border border-current outline-none bg-purple-700 hover:bg-purple-800 active:bg-purple-700 ${
             //   isLoading ? "opacity-50 cursor-not-allowed" : ""
             // }`}

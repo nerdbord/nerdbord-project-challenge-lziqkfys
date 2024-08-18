@@ -61,7 +61,7 @@ export default function RootLayout({
                   </Button>
                 </SignedIn>
               </header>
-              <main>{children}</main>
+              <main className="max-w-[1440px]">{children}</main>
             </DynamicFormProvider>
             <Footer />
           </Container>
