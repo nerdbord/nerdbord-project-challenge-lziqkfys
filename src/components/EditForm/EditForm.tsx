@@ -1,12 +1,6 @@
 "use client";
 import { useFieldArray, useForm } from "react-hook-form";
-import {
-  FormElementType,
-  formElementVariants,
-  FormSchema,
-  FormType,
-  generateSchema,
-} from "@/types/types";
+import {  FormElementType,  formElementVariants,  FormSchema,  FormType,} from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { useState } from "react";
@@ -16,23 +10,8 @@ import { updateFormDataWithNewUserID } from "@/app/db";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Checkbox } from "../ui/checkbox";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import {  Select,  SelectTrigger,  SelectValue,  SelectContent, SelectItem,} from "@/components/ui/select";
+import {  Form,  FormControl,  FormDescription,  FormField,  FormItem,  FormLabel,  FormMessage} from "../ui/form";
 import OptionsFieldArray from "./OptionsFieldArray";
 import TrashIcon from "../icons/TrashIcon";
 import React from "react";
@@ -48,10 +27,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { PlusIcon } from "lucide-react";
 import PlusCircleIcon from "../icons/PlusCircleIcon";
 import Spinner from "../icons/Spinner";
-import { redirect } from "next/navigation";
 
 interface EditFormProps {
   formId: string;
