@@ -84,13 +84,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
         To jest nazwa formularza: {dynamicForm.formName}
       </h1>
       <Form {...form}>
-        <form className="w-full max-w-lg" onSubmit={handleSubmit(onSubmit)}>
+        <form className="w-full max-w-lg flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Pola formularza</TableHead>
-              </TableRow>
-            </TableHeader>
             <TableBody>
               {elements.map(
                 (element: FormElementType, elementsIndex: number) => (

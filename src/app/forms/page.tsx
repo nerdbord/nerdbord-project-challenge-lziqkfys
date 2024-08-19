@@ -47,6 +47,10 @@ const FormsPage = () => {
   const [deleteModal, setDeleteModal] = useState(false);
   const [trashColour, setTrashColour] = useState(false);
   const [formsList, setFormsList] = useState<FormType[]>();
+  // Przechowywanie ID formularza do usunięcia:
+  const [selectedFormId, setSelectedFormId] = useState<string | null>(null);
+  // Nowy stan:
+  const [selectedFormName, setSelectedFormName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSignedIn) {
@@ -66,9 +70,21 @@ const FormsPage = () => {
     fetchFormData();
   }, [userId, deleteModal, isSignedIn]);
 
-  const handleDelete = (formID: string) => {
-    setDeleteModal((prev) => !prev);
-    deleteFormByFormID(formID);
+  // const handleDelete = (formID: string) => {
+  //   setDeleteModal((prev) => !prev);
+  //   deleteFormByFormID(formID);
+  // };
+
+  const handleDelete = async () => {
+    if (selectedFormId) {
+      await deleteFormByFormID(selectedFormId);
+      setFormsList((prevForms) =>
+        prevForms?.filter((form) => form.formId !== selectedFormId)
+      );
+      setSelectedFormId(null);
+      setSelectedFormName(null); // Resetuj po usunięciu
+    }
+    setDeleteModal(false);
   };
 
   const handleCopyUrl = (formID: string) => {
@@ -107,14 +123,24 @@ const FormsPage = () => {
                   <TableCell>
                     {
                       <div className="flex justify-center cursor-pointer">
-                        <AlertDialogTrigger>
-                          <TrashIcon />
+                        <AlertDialogTrigger asChild>
+                          <div
+                            onClick={() => {
+                              setSelectedFormId(form.formId);
+                              setSelectedFormName(form.formName); // Ustaw nazwę formularza
+                              setDeleteModal(true);
+                            }}
+                          >
+                            <TrashIcon />
+                          </div>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
                             <AlertDialogTitle>
                               Delete{" "}
-                              {'form "' + form.formName + '"' || "unnamed form"}
+                              {selectedFormName
+                                ? `form "${selectedFormName}"`
+                                : "unnamed form"}
                               ?
                             </AlertDialogTitle>
                             <AlertDialogDescription>
@@ -123,11 +149,17 @@ const FormsPage = () => {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel
+                              onClick={() => {
+                                setDeleteModal(false);
+                              }}
+                            >
+                              Cancel
+                            </AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               onClick={() => {
-                                handleDelete(form.formId);
+                                handleDelete();
                               }}
                             >
                               Continue
