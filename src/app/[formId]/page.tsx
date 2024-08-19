@@ -6,6 +6,7 @@ import DisplayForm from "@/components/DisplayForm/DisplayForm";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
+import Spinner from "@/components/icons/Spinner";
 
 interface FormIdPageProps {
   params: {
@@ -44,7 +45,12 @@ const FormIdPage = ({ params }: FormIdPageProps) => {
   }, [formID]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="text-center my-20">
+        <Spinner />
+        <h1 className=" mt-5 text-4xl font-extrabold">Loading...</h1>
+      </div>
+    );
   }
 
   if (error) {

@@ -115,7 +115,7 @@ const EditForm = (props: EditFormProps) => {
             <ArrowIconLeft />
           </a>
         </Button>
-        Edytujesz formularz "{dynamicForm.formName}"
+        Edytujesz formularz &quot;{dynamicForm.formName}&quot;
       </h1>
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)}>
