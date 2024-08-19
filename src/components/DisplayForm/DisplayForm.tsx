@@ -98,11 +98,6 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
       <Form {...form}>
         <form className="w-full max-w-lg" onSubmit={handleSubmit(onSubmit)}>
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Pola formularza</TableHead>
-              </TableRow>
-            </TableHeader>
             <TableBody>
               {elements.map((element: FormElementType, index: number) => (
                 <TableRow key={index} className="border">
