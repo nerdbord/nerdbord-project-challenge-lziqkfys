@@ -213,10 +213,10 @@ const EditForm = (props: EditFormProps) => {
                 </TableCell>
               </TableRow>
               {fields.map((thisField, i) => (
-                <React.Fragment key={i}>
-                  <AlertDialog key={i}>
+                <React.Fragment key={thisField.id}> {/* Zmieniono z `i` na `thisField.id` */}
+                  <AlertDialog>
                     <TableRow
-                      key={i}
+                      
                       className={`border-l border-r border-t ${
                         watch(`formData.${i}.type`) === "select" && "border-b-0"
                       }`}
