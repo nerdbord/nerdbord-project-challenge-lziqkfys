@@ -99,8 +99,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {elements.map((element: FormElementType, index: number) => (
-                <TableRow key={index} className="border">
+              {elements.map((element: FormElementType, elementsIndex: number) => (
+                <TableRow key={elementsIndex} className="border">
                   <TableCell className="font-medium">
                     <FormField
                       control={control}
@@ -120,8 +120,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
                               </FormControl>
                               <SelectContent>
                                 {element.options &&
-                                  element.options.map((option) => (
-                                    <SelectItem value={option.option}>
+                                  element.options.map((option, optionIndex) => (
+                                    <SelectItem value={option.option} key={optionIndex}>
                                       {option.option}
                                     </SelectItem>
                                   ))}

@@ -210,8 +210,8 @@ const EditForm = (props: EditFormProps) => {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {formElementVariants.map((variant, i) => (
-                                    <SelectItem value={variant}>
+                                  {formElementVariants.map((variant, variantIndex) => (
+                                    <SelectItem value={variant} key={variantIndex}>
                                       {variant}
                                     </SelectItem>
                                   ))}

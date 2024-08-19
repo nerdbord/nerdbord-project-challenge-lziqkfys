@@ -72,7 +72,7 @@ const FormsPage = () => {
   };
 
   const handleCopyUrl = (formID: string) => {
-    const copyUrl = `formatrix.com/${formID}`;
+    const copyUrl = `formatrix.netlify.app/${formID}`;
     navigator.clipboard.writeText(copyUrl);
     toast({
       title: "URL copied to clipboard.",
