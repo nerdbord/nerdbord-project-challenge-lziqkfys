@@ -59,9 +59,9 @@ export const generateSchema = (form: FormType) => {
     switch (element.type) {
       case "number":
       case "tel":
-        fieldSchema = z.number();
+        fieldSchema = z.coerce.number();
         if (element.required) {
-          fieldSchema = z.number().min(1);
+          fieldSchema = z.coerce.number().min(1);
         }
         break;
       case "checkbox":
