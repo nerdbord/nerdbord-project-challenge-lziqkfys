@@ -51,15 +51,6 @@ const SubmittedPage = ({ params }: FormIdPageProps) => {
     const fetchFormData = async () => {
       try {
         const form = await getFormDataByFormID(formID);
-        if (form[0].userId && userId !== form[0].userId.toString()) {
-          setError(
-            new Error(
-              "You're trying to edit a form which does not belong to you."
-            )
-          );
-          setLoading(false);
-          return;
-        }
         setDynamicForm(form[0] as FormType);
         setLoading(false);
       } catch (err) {
@@ -86,7 +77,9 @@ const SubmittedPage = ({ params }: FormIdPageProps) => {
 
   return (
     <div className="text-center my-20">
-      <h1 className=" mt-5 text-4xl font-extrabold">Dziękujemy za wypełnienie ankiety!</h1>
+      <h1 className=" mt-5 text-4xl font-extrabold">
+        Dziękujemy za wypełnienie ankiety!
+      </h1>
       <h2 className="mt-4 text-xl font-semibold mb-16">
         Teraz stwórz swoją własną!
       </h2>
