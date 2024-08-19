@@ -67,19 +67,21 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
     console.log(data);
 
     try {
-      // const response = await fetch(dynamicForm.webhookUrl as string, {
-      const response = await fetch("https://submit-form.com/YKEFWFXpa", {
+      const response = await fetch(dynamicForm.webhookUrl as string, {
+        //const response = await fetch("https://submit-form.com/YKEFWFXpa", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(data),
         //mode: "no-cors"
       });
       if (response.ok) {
+        console.log("RESPONSE: ", response);
         alert("Form submitted successfully!");
       } else {
-        console.error("Bad response: ", response)
+        console.error("Bad response: ", response);
         alert("Failed to submit the form.");
       }
     } catch (error) {
