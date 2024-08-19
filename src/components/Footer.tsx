@@ -9,11 +9,11 @@ const footerLinks = [
     label: "Filip",
   },
   {
-    href: "",
+    href: "https://www.linkedin.com/in/wu-kortas/",
     label: "Viera",
   },
   {
-    href: "https://linkedin.com/in/julia-dutka-532a3a207",
+    href: "https://www.linkedin.com/in/julia-dutka-532a3a207",
     label: "Julia",
   },
   {
