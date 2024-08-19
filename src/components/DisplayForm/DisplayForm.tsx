@@ -27,6 +27,13 @@ import {
   TableRow,
 } from "../ui/table";
 import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface DisplayFormProps {
   formId: string;
@@ -38,7 +45,7 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   const formSchema = generateSchema(dynamicForm);
 
   // const form = useForm<FormType>({
-    const form = useForm({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     // defaultValues: dynamicForm as FormType,
     defaultValues: dynamicForm,
@@ -49,12 +56,19 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   // resolver: zodResolver(formSchema),
   // defaultValues: dynamicForm as FormType,
   // });
-  const { control, handleSubmit } = form;
+  const {
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = form;
 
   const onSubmit = async (data: any) => {
+    console.log(data);
+
     try {
       // const response = await fetch(dynamicForm.webhookUrl as string, {
-      const response = await fetch(dynamicForm.webhookUrl || "https://submit-form.com/kGteNP1Hj", {
+      const response = await fetch("https://submit-form.com/YKEFWFXpa", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,6 +79,7 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
       if (response.ok) {
         alert("Form submitted successfully!");
       } else {
+        console.error("Bad response: ", response)
         alert("Failed to submit the form.");
       }
     } catch (error) {
@@ -81,7 +96,6 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
       <Form {...form}>
         <form className="w-full max-w-lg" onSubmit={handleSubmit(onSubmit)}>
           <Table>
-            <TableCaption>Form ID: {formId}</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>Pola formularza</TableHead>
@@ -97,15 +111,35 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>{element.label}</FormLabel>
-                          <FormControl>
-                            <Input
-                              type={element.type}
-                              placeholder={element.placeholder || ""}
-                              required={element.required}
-                              {...field}  // Assigning field to input
-                            />
-                          </FormControl>
-                          <FormDescription />
+                          {element.type === "select" ? (
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value?.toString()}
+                            >
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select option" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                {element.options &&
+                                  element.options.map((option) => (
+                                    <SelectItem value={option.option}>
+                                      {option.option}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <FormControl>
+                              <Input
+                                type={element.type}
+                                placeholder={element.placeholder || ""}
+                                required={element.required}
+                                {...field} // Assigning field to input
+                              />
+                            </FormControl>
+                          )}
                           <FormMessage />
                         </FormItem>
                       )}
@@ -129,7 +163,13 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
               />
             </div>
           ))} */}
-          <Button type="submit" className="mt-12">Wyślij</Button>
+          <Button
+            type="submit"
+            className="mt-12"
+            onClick={() => console.log(errors)}
+          >
+            Wyślij
+          </Button>
         </form>
       </Form>
     </div>
