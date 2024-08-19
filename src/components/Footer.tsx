@@ -33,7 +33,7 @@ export default function Footer() {
     <footer className="mt-auto text-[#94A3B8] border-t text-center text-sm py-14 w-full">
       <div className="w-[280px] mx-auto leading-6 flex-col">
         <div>&copy; {year} Fromulatrix | All Rights Reserved</div>
-        <ul className="flex gap-x-3 text-[14px] justify-between align-center">
+        <ul className="flex text-[14px] justify-around align-center">
           {footerLinks.map((link) => (
             <li key={link.href}>
               <Link
