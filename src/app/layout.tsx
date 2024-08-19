@@ -12,6 +12,8 @@ import {
 import { DynamicFormProvider } from "@/context/DynamicFormContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Container from "@/components/Container";
+import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import StickerSmileyIcon from "@/components/icons/StickerSmileyIcon";
 
@@ -39,28 +41,33 @@ export default function RootLayout({
             fontSans.variable
           )}
         >
-          <DynamicFormProvider>
-            <header className="sticky top-0 flex h-16 items-center justify-between gap-4 border-b bg-background px-4 md:px-6 z-50">
-              <Button variant="outline"><a href="/">Formatrix</a></Button>
-              <SignedOut>
-                <div className="flex gap-4">
-                  <Button className="min-w-36">
-                    <SignInButton>Zaloguj</SignInButton>
-                  </Button>
-                  <Button variant="outline" className="min-w-36">
-                    <SignUpButton>Zarejestruj się</SignUpButton>
-                  </Button>
-                </div>
-              </SignedOut>
-              <SignedIn>
+          <Container>
+            <DynamicFormProvider>
+              <header className="sticky top-0 flex h-16 items-center justify-between gap-4 bg-background px-4 md:px-6">
                 <Button variant="outline">
-                  <a href="/forms">Panel użytkownika</a>
+                  <a href="/">Formatrix</a>
                 </Button>
-              </SignedIn>
-            </header>
-            <Toaster/>
-            <main>{children}</main>
-          </DynamicFormProvider>
+                <SignedOut>
+                  <div className="flex gap-4">
+                    <Button className="min-w-36">
+                      <SignInButton>Zaloguj</SignInButton>
+                    </Button>
+                    <Button variant="outline" className="min-w-36">
+                      <SignUpButton>Zarejestruj się</SignUpButton>
+                    </Button>
+                  </div>
+                </SignedOut>
+                <SignedIn>
+                  <Button variant="outline">
+                    <a href="/forms">Panel użytkownika</a>
+                  </Button>
+                </SignedIn>
+              </header>
+              <Toaster />
+              <main className="max-w-[1440px]">{children}</main>
+            </DynamicFormProvider>
+            <Footer />
+          </Container>
         </body>
       </html>
     </ClerkProvider>

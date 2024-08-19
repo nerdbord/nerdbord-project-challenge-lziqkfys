@@ -1,8 +1,11 @@
-import { dataBase } from "../db";
-import { forms } from "../db/schema";
-import { eq } from "drizzle-orm";
-import { FormType } from "@/types/types";
+"use client";
 
+import { getFormDataByFormID } from "../db";
+import { FormType } from "@/types/types";
+import DisplayForm from "@/components/DisplayForm/DisplayForm";
+import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useDynamicFormContext } from "@/context/DynamicFormContext";
 
 interface FormIdPageProps {
   params: {
@@ -10,42 +13,45 @@ interface FormIdPageProps {
   };
 }
 
-const FormIdPage = async ({ params }: { params: FormIdPageProps }) => {
+const FormIdPage = ({ params }: FormIdPageProps) => {
+  const formID = params.formId;
+  const { userId } = useAuth();
+  const { dynamicForm, setDynamicForm } = useDynamicFormContext();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
-  if (!form) {
-    return <div>Form not found</div>;
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        const fetchedFormData = await getFormDataByFormID(formID);
+        if (!fetchedFormData || fetchedFormData.length === 0) {
+          setError(new Error("Form not found"));
+          setLoading(false);
+          return;
+        }
+
+        const formDetails = fetchedFormData[0];
+
+        setDynamicForm(formDetails as FormType);
+        setLoading(false);
+      } catch (err) {
+        setError(err as Error);
+        setLoading(false);
+      }
+    };
+
+    fetchFormData();
+  }, [formID]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  const { formId, userId, formData, webhookUrl, createdAt, published } = form;
-  console.log("FORM: ", form)
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
-  return (
-    <div className="flex flex-col items-center justify-center">
-      <h1>Form ID: {formId}</h1>
-      <ul>
-        <li>User ID: {userId}</li>
-        <li>Webhook URL: {webhookUrl}</li>
-        <li>Created At: {new Date(createdAt).toLocaleString()}</li>
-        <li>Published: {published ? "Yes" : "No"}</li>
-      </ul>
-      <form className="w-full max-w-lg">
-        {form?.elements.map((element: any, index: number) => (
-          <div key={index} className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              {element.label}
-            </label>
-            <input
-              type={element.type}
-              placeholder={element.placeholder}
-              required={element.required}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
-          </div>
-        ))}
-      </form>
-      <pre></pre>
-    </div>
-  );
+  return <DisplayForm formId={formID} />;
 };
 
 export default FormIdPage;

@@ -34,7 +34,7 @@ export default function FormsLayout({
           <h4 className=" font-semibold mb-4">Panel użytkownika</h4>
           <Button className="rounded-none gap-2 w-full flex flex-row justify-start">
             <ForwardIcon />
-            Zapisane formulaże
+            Zapisane formularze
           </Button>
           <Button
             variant="outline"
