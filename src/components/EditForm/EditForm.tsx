@@ -164,7 +164,6 @@ const EditForm = (props: EditFormProps) => {
                             value={field.value || undefined}
                           />
                         </FormControl>
-                        <FormDescription>This is Form Name</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -178,7 +177,7 @@ const EditForm = (props: EditFormProps) => {
                       <FormItem>
                         <TooltipProvider>
                           <Tooltip>
-                            <TooltipTrigger>
+                            <TooltipTrigger type="button">
                               <FormLabel className="text-xl">
                                 Webhook URL
                               </FormLabel>
@@ -207,7 +206,6 @@ const EditForm = (props: EditFormProps) => {
                             value={field.value || undefined}
                           />
                         </FormControl>
-                        <FormDescription>This is webhook url</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
