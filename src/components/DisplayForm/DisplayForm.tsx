@@ -44,10 +44,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   const elements = dynamicForm.formData || [];
   const formSchema = generateSchema(dynamicForm);
 
-  // const form = useForm<FormType>({
   const form = useForm({
     resolver: zodResolver(formSchema),
-    // defaultValues: dynamicForm as FormType,
     defaultValues: dynamicForm,
   });
 
@@ -59,7 +57,6 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
   } = form;
 
@@ -68,14 +65,12 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
 
     try {
       const response = await fetch(dynamicForm.webhookUrl as string, {
-        //const response = await fetch("https://submit-form.com/YKEFWFXpa", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify(data),
-        //mode: "no-cors"
       });
       if (response.ok) {
         console.log("RESPONSE: ", response);
@@ -109,10 +104,10 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
                   <TableCell className="font-medium">
                     <FormField
                       control={control}
-                      name={element.fieldName}
+                      name={element.fieldName as any}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{element.label}</FormLabel>
+                          <FormLabel>{element.label}{element.required ? <span className="text-red-500"> *</span> : <></>}</FormLabel>
                           {element.type === "select" ? (
                             <Select
                               onValueChange={field.onChange}
@@ -138,7 +133,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
                                 type={element.type}
                                 placeholder={element.placeholder || ""}
                                 required={element.required}
-                                {...field} // Assigning field to input
+                                value={field.value}
+                                onChange={field.onChange}
                               />
                             </FormControl>
                           )}
