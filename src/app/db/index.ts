@@ -55,6 +55,10 @@ export const insertFormData = async (formData: FormType) => {
   redirect(`/${serverResponse[0].insertedID}/edit`);
 };
 
+export const redirectToSubmitted = async (formID: string) => {
+  redirect(`/${formID}/submitted`)
+}
+
 export const deleteFormByFormID = async (formID: string) => {
   return await db.delete(schema.forms).where(eq(schema.forms.formId, formID))
 }

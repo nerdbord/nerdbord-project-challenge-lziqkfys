@@ -1,8 +1,6 @@
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import {
   FormElementType,
-  FormSchema,
-  FormType,
   generateSchema,
 } from "@/types/types";
 import { useForm } from "react-hook-form";
@@ -11,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,7 +17,6 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -34,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { redirectToSubmitted } from "@/app/db";
 
 interface DisplayFormProps {
   formId: string;
@@ -49,11 +46,6 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
     defaultValues: dynamicForm,
   });
 
-  // Początkowy kod:
-  // const { register, handleSubmit } = useForm<FormType>({
-  // resolver: zodResolver(formSchema),
-  // defaultValues: dynamicForm as FormType,
-  // });
   const {
     control,
     handleSubmit,
@@ -74,7 +66,8 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
       });
       if (response.ok) {
         console.log("RESPONSE: ", response);
-        alert("Form submitted successfully!");
+        //alert("Form submitted successfully!");
+        redirectToSubmitted(dynamicForm.formId)
       } else {
         console.error("Bad response: ", response);
         alert("Failed to submit the form.");
