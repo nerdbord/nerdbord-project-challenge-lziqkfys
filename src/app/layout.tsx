@@ -43,7 +43,7 @@ export default function RootLayout({
         >
           <Container>
             <DynamicFormProvider>
-              <header className="sticky top-0 flex h-16 items-center justify-between gap-4 bg-background px-4 md:px-6">
+              <header className="sticky top-0 flex h-16 items-center justify-between gap-4 bg-background px-4 md:px-6 border-b z-10">
                 <Button variant="outline">
                   <a href="/">Formatrix</a>
                 </Button>

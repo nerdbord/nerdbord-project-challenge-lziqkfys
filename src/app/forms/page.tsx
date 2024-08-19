@@ -87,7 +87,6 @@ const FormsPage = () => {
       </h1>
       <AlertDialog>
         <Table>
-          <TableCaption>Forms of {userId}</TableCaption>
           <TableBody className="border">
             {formsList?.map((form, i) => {
               return (

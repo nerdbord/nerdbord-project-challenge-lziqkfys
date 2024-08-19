@@ -54,9 +54,6 @@ export default function Home() {
             type="submit"
             onClick={handleClick}
             className="px-4 py-2 w-[166px]"
-            // className={`px-5 py-2.5 rounded-full text-white text-sm tracking-wider font-medium border border-current outline-none bg-purple-700 hover:bg-purple-800 active:bg-purple-700 ${
-            //   isLoading ? "opacity-50 cursor-not-allowed" : ""
-            // }`}
             disabled={isLoading}
           >
             {isLoading ? "Loading..." : "Wygeneruj"}
