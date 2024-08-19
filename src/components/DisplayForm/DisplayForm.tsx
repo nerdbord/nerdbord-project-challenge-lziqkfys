@@ -96,7 +96,7 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
         To jest nazwa formularza: {dynamicForm.formName}
       </h1>
       <Form {...form}>
-        <form className="w-full max-w-lg" onSubmit={handleSubmit(onSubmit)}>
+        <form className="w-full max-w-lg flex flex-col items-center" onSubmit={handleSubmit(onSubmit)}>
           <Table>
             <TableBody>
               {elements.map((element: FormElementType, index: number) => (
@@ -146,20 +146,6 @@ const DisplayForm = ({ formId }: DisplayFormProps) => {
               ))}
             </TableBody>
           </Table>
-          {/* {elements.map((element: FormElementType, index: number) => (
-            <div key={index} className="mb-4 bg-orange-400">
-              <label className="block text-gray-700 text-sm font-bold mb-2">
-                {element.label}
-              </label>
-              <input
-                type={element.type}
-                placeholder={element.placeholder || ""}
-                required={element.required}
-                // {...register(element.fieldName)}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
-            </div>
-          ))} */}
           <Button
             type="submit"
             className="mt-12"
