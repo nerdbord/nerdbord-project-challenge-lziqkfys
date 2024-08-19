@@ -1,5 +1,20 @@
 import { z } from "zod";
 
+export const formElementVariants = [
+  "checkbox",
+  "color",
+  "email",
+  "password",
+  "date",
+  "number",
+  "range",
+  "text",
+  "time",
+  "url",
+  "tel",
+  "select",
+];
+
 export const FormElementSchema = z.object({
   fieldName: z.string(),
   label: z.string(),
@@ -16,8 +31,6 @@ export const FormElementSchema = z.object({
     z.literal("text"),
     z.literal("time"),
     z.literal("url"),
-    z.literal("week"),
-    z.literal("month"),
     z.literal("tel"),
     z.literal("date"),
     z.literal("select"),
@@ -31,8 +44,8 @@ export const FormSchema = z.object({
   formName: z.string().nullable(),
   formData: z.array(FormElementSchema),
   userId: z.string().nullable(),
-  webhookUrl: z.string().nullable(),
-  createdAt: z.string().nullable(),
+  webhookUrl: z.string().url().nullable(),
+  createdAt: z.union([z.string(),z.date()]).nullable()
 });
 
 export type FormType = z.infer<typeof FormSchema>;
