@@ -1,6 +1,11 @@
 "use client";
 import { useFieldArray, useForm } from "react-hook-form";
-import {  FormElementType,  formElementVariants,  FormSchema,  FormType,} from "@/types/types";
+import {
+  FormElementType,
+  formElementVariants,
+  FormSchema,
+  FormType,
+} from "@/types/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { useState } from "react";
@@ -10,8 +15,29 @@ import { updateFormDataWithNewUserID } from "@/app/db";
 import { Table, TableBody, TableCell, TableRow } from "../ui/table";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import {  Select,  SelectTrigger,  SelectValue,  SelectContent, SelectItem,} from "@/components/ui/select";
-import {  Form,  FormControl,  FormDescription,  FormField,  FormItem,  FormLabel,  FormMessage} from "../ui/form";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 import OptionsFieldArray from "./OptionsFieldArray";
 import TrashIcon from "../icons/TrashIcon";
 import React from "react";
@@ -150,7 +176,30 @@ const EditForm = (props: EditFormProps) => {
                     name="webhookUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xl">Webhook URL</FormLabel>
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <FormLabel className="text-xl">
+                                Webhook URL
+                              </FormLabel>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                Webhook URL służy do automatycznego przesyłania
+                                danych formularza do wskazanego adresu URL.
+                                Dowiedz się więcej na&nbsp;
+                                <a
+                                  href="https://www.formspark.io/"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline text-blue-500"
+                                >
+                                  Formspark
+                                </a>
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         <FormControl>
                           <Input
                             placeholder=""
