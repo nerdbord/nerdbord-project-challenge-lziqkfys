@@ -56,6 +56,7 @@ import {
 } from "../ui/alert-dialog";
 import PlusCircleIcon from "../icons/PlusCircleIcon";
 import Spinner from "../icons/Spinner";
+import { useToast } from "../ui/use-toast";
 
 interface EditFormProps {
   formId: string;
@@ -68,6 +69,7 @@ const EditForm = (props: EditFormProps) => {
   const { openSignIn } = useClerk();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<FormType>({
     resolver: zodResolver(FormSchema),
@@ -112,7 +114,10 @@ const EditForm = (props: EditFormProps) => {
   const handleCopyLink = () => {
     const linkToCopy = `${window.location.origin}/forms/${props.formId}`;
     navigator.clipboard.writeText(linkToCopy).then(() => {
-      alert("Link został skopiowany!");
+      toast({
+        title: "URL copied to clipboard.",
+        description: linkToCopy,
+      });
     });
   };
 
@@ -298,7 +303,7 @@ const EditForm = (props: EditFormProps) => {
                           <AlertDialogContent>
                             <AlertDialogHeader>
                               <AlertDialogTitle>
-                                Are you absolutely sure?
+                                Delete field {watch(`formData.${i}.fieldName`)}?
                               </AlertDialogTitle>
                               <AlertDialogDescription>
                                 This will remove the form field.
@@ -373,16 +378,28 @@ const EditForm = (props: EditFormProps) => {
             >
               <PlusCircleIcon />
             </div>
-            <Button
-              className="m-5"
-              disabled={isLoading}
-              type="submit"
-              onClick={() => {
-                console.log(errors);
-              }}
-            >
-              SAVE FORM
-            </Button>
+            <div>
+              <Button
+                className="m-5"
+                disabled={isLoading}
+                type="submit"
+                onClick={() => {
+                  console.log(errors);
+                }}
+              >
+                SAVE
+              </Button>
+              <Button
+                className="m-5"
+                disabled={isLoading}
+                type="button"
+                onClick={() => {
+                  reset(dynamicForm);
+                }}
+              >
+                RESET
+              </Button>
+            </div>
           </div>
         </form>
       </Form>
