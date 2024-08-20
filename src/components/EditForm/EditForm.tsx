@@ -90,7 +90,10 @@ const EditForm = (props: EditFormProps) => {
     setIsLoading(true);
     const handleSaveDataToServer = async () => {
       if (!isSignedIn) {
-        openSignIn();
+        openSignIn({
+          redirectUrl: `/${dynamicForm.formId}/edit`,
+          afterSignInUrl: `/${dynamicForm.formId}/edit`,
+        });
       }
       if (userId && data.webhookUrl && data.formName) {
         try {
