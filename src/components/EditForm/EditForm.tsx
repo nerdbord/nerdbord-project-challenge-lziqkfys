@@ -65,6 +65,7 @@ const EditForm = (props: EditFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { userId, isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
+  const [isModalOpen, setIsModalOpen ] = useState(false)
 
   const form = useForm<FormType>({
     resolver: zodResolver(FormSchema),
@@ -96,6 +97,7 @@ const EditForm = (props: EditFormProps) => {
             data.webhookUrl,
             data.formName
           );
+          setIsModalOpen(true)
         } catch (error) {
           console.error("Failed to update form data:", error);
         }
@@ -366,6 +368,24 @@ const EditForm = (props: EditFormProps) => {
           </div>
         </form>
       </Form>
+      {/* Modal który pojawi się po zapisaniu formularza */}
+    {isModalOpen && (
+      <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Twój formularz został zapisany!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Formularz został pomyślnie zapisany.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button onClick={() => setIsModalOpen(false)}>
+              Wyjdź
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    )}
     </div>
   );
 };
