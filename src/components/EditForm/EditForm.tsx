@@ -9,6 +9,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDynamicFormContext } from "@/context/DynamicFormContext";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import generateUniqueId from "generate-unique-id";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { updateFormDataWithNewUserID } from "@/app/db";
@@ -65,7 +66,8 @@ const EditForm = (props: EditFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { userId, isSignedIn } = useAuth();
   const { openSignIn } = useClerk();
-  const [isModalOpen, setIsModalOpen ] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   const form = useForm<FormType>({
     resolver: zodResolver(FormSchema),
@@ -97,7 +99,7 @@ const EditForm = (props: EditFormProps) => {
             data.webhookUrl,
             data.formName
           );
-          setIsModalOpen(true)
+          setIsModalOpen(true);
         } catch (error) {
           console.error("Failed to update form data:", error);
         }
@@ -106,6 +108,16 @@ const EditForm = (props: EditFormProps) => {
     };
 
     handleSaveDataToServer();
+  };
+  const handleCopyLink = () => {
+    const linkToCopy = `${window.location.origin}/forms/${props.formId}`;
+    navigator.clipboard.writeText(linkToCopy).then(() => {
+      alert("Link został skopiowany!");
+    });
+  };
+
+  const handleExit = () => {
+    router.push("/forms"); // Przekierowanie do zapisanych formularzy
   };
 
   const { fields, remove, insert } = useFieldArray<FormType>({
@@ -215,10 +227,11 @@ const EditForm = (props: EditFormProps) => {
                 </TableCell>
               </TableRow>
               {fields.map((thisField, i) => (
-                <React.Fragment key={thisField.id}> {/* Zmieniono z `i` na `thisField.id` */}
+                <React.Fragment key={thisField.id}>
+                  {" "}
+                  {/* Zmieniono z `i` na `thisField.id` */}
                   <AlertDialog>
                     <TableRow
-                      
                       className={`border-l border-r border-t ${
                         watch(`formData.${i}.type`) === "select" && "border-b-0"
                       }`}
@@ -259,11 +272,16 @@ const EditForm = (props: EditFormProps) => {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  {formElementVariants.map((variant, variantIndex) => (
-                                    <SelectItem value={variant} key={variantIndex}>
-                                      {variant}
-                                    </SelectItem>
-                                  ))}
+                                  {formElementVariants.map(
+                                    (variant, variantIndex) => (
+                                      <SelectItem
+                                        value={variant}
+                                        key={variantIndex}
+                                      >
+                                        {variant}
+                                      </SelectItem>
+                                    )
+                                  )}
                                 </SelectContent>
                               </Select>
                             </FormItem>
@@ -369,23 +387,38 @@ const EditForm = (props: EditFormProps) => {
         </form>
       </Form>
       {/* Modal który pojawi się po zapisaniu formularza */}
-    {isModalOpen && (
-      <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Twój formularz został zapisany!</AlertDialogTitle>
+      {isModalOpen && (
+        <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <AlertDialogContent>
+            <div className="flex justify-between items-center font-semibold">
+              <AlertDialogTitle>
+                Twój formularz został zapisany!
+              </AlertDialogTitle>
+              <button onClick={() => setIsModalOpen(false)} className="text-xl">
+                &times; {/* Ikona krzyżyka */}
+              </button>
+            </div>
             <AlertDialogDescription>
-              Formularz został pomyślnie zapisany.
+              Jeśli chcesz go udostępnić, skopiuj poniższy link.
+              <div className="mt-4">
+                <Input
+                  readOnly
+                  value={`${window.location.origin}/forms/${props.formId}`} // Link do skopiowania
+                />
+              </div>
             </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <Button onClick={() => setIsModalOpen(false)}>
-              Wyjdź
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    )}
+
+            <AlertDialogFooter className="flex justify-between">
+              <Button variant="outline" onClick={handleExit}>
+                Wyjdź
+              </Button>
+              <Button type="button" onClick={handleCopyLink}>
+                Skopiuj link
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   );
 };
