@@ -7,7 +7,6 @@ import {
   SignUpButton,
   SignedIn,
   SignedOut,
-  UserButton,
 } from "@clerk/nextjs";
 import { DynamicFormProvider } from "@/context/DynamicFormContext";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import Container from "@/components/Container";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
-import StickerSmileyIcon from "@/components/icons/StickerSmileyIcon";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -64,7 +62,9 @@ export default function RootLayout({
                 </SignedIn>
               </header>
               <Toaster />
-              <main className="max-w-[1440px]">{children}</main>
+              <main className="flex justify-center">
+                <div className="max-w-[1440px]">{children}</div>
+              </main>
             </DynamicFormProvider>
             <Footer />
           </Container>
